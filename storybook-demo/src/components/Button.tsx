@@ -3,8 +3,10 @@ import classNames from "classnames";
 export interface ButtonProps {
   type?: "primary" | "secondary" | "ghost" | "default";
   size?: "small" | "medium" | "large";
-  label: string;
-  onClick?: () => void;
+  label?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
 function calcTypeClass(type: ButtonProps["type"]): string {
@@ -39,11 +41,14 @@ function calcSizeClass(size: ButtonProps["size"]): string {
 }
 
 export default function Button(props: ButtonProps) {
-  const { type = "primary", size = "medium", label, onClick = () => {} } = props;
-  const btnClasses = classNames("btn", calcTypeClass(type), calcSizeClass(size));
+  const { type = "primary", size = "medium", label = "", disabled, loading, onClick = () => {} } = props;
+  const btnClasses = classNames("btn", calcTypeClass(type), calcSizeClass(size), {
+    "btn-disabled": disabled,
+    "loading loading-spinner": loading,
+  });
   return (
     <button onClick={onClick} className={btnClasses}>
-      {label}
+      {!loading && label}
     </button>
   );
 }
