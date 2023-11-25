@@ -6,4 +6,9 @@ export default {
     daisyui: {
         themes: ["light", "dark", "cupcake"],
     },
+    theme: {
+        fontFamily: {
+            death: ['death-note'],
+        }
+    }
 };
