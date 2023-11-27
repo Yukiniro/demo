@@ -1,8 +1,9 @@
 import React from "react";
 import classNames from "classnames";
+import "./index.css";
 
 export interface ButtonProps {
-  type?: "primary" | "secondary" | "ghost" | "default";
+  type?: "primary" | "secondary";
   size?: "small" | "medium" | "large";
   label?: string;
   disabled?: boolean;
@@ -18,9 +19,6 @@ function calcTypeClass(type: ButtonProps["type"]): string {
       break;
     case "secondary":
       typeClass = "btn-secondary";
-      break;
-    case "ghost":
-      typeClass = "btn-ghost";
       break;
   }
 
@@ -45,10 +43,11 @@ export default function Button(props: ButtonProps): JSX.Element {
   const { type = "primary", size = "medium", label = "", disabled, loading, onClick = () => {} } = props;
   const btnClasses = classNames("btn", calcTypeClass(type), calcSizeClass(size), {
     "btn-disabled": disabled,
+    "btn-loading": loading,
   });
   return (
     <button onClick={onClick} className={btnClasses}>
-      {loading && <span className="loading loading-spinner" />}
+      {loading && <span>Loading...</span>}
       {!loading && label && <span>{label}</span>}
     </button>
   );
