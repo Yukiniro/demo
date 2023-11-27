@@ -10,7 +10,7 @@
     "build": "father build",
     "build:watch": "father dev",
     "docs:build": "dumi build",
-    "prepare": "husky install && dumi setup",
+    "prepare": "dumi setup",
     "doctor": "father doctor",
     "lint": "npm run lint:es && npm run lint:css",
     "lint:css": "stylelint \"{src,test}/**/*.{css,less}\"",
@@ -54,19 +54,22 @@
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
+    "@types/node": "^20.10.0",
     "@types/react": "^18.2.38",
     "@types/react-dom": "^18.2.17",
     "@umijs/lint": "^4.0.88",
+    "autoprefixer": "^10.4.16",
     "dumi": "^2.2.14",
     "eslint": "^8.54.0",
     "father": "^4.3.7",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.1.0",
     "prettier": "^3.1.0",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-packagejson": "^2.4.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "stylelint": "^15.11.0"
+  },
+  "dependencies": {
+    "classnames": "^2.3.2"
   }
 }

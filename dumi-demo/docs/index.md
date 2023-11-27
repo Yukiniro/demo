@@ -1,6 +1,6 @@
 ---
 hero:
-  title: library
+  title: 组件库
   description: A react library developed with dumi
   actions:
     - text: Hello
