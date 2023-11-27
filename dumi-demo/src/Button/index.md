@@ -1,3 +1,10 @@
+---
+title: Button
+nav:
+  title: 组件
+  path: /components
+---
+
 # Button
 
 基本按钮组件。
@@ -95,3 +102,5 @@ export default () => {
   );
 };
 ```
+
+<API id="Button"></API>

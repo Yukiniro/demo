@@ -2,12 +2,35 @@ import React from "react";
 import classNames from "classnames";
 import "./index.css";
 
-export interface ButtonProps {
+interface ButtonProps {
+  /**
+   * 按钮类型
+   */
   type?: "primary" | "secondary";
+
+  /**
+   * 按钮大小
+   */
   size?: "small" | "medium" | "large";
+
+  /**
+   * 按钮文本
+   */
   label?: string;
+
+  /**
+   * 是否禁用
+   */
   disabled?: boolean;
+
+  /**
+   * 是否加载中
+   */
   loading?: boolean;
+
+  /**
+   * 点击事件
+   */
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 

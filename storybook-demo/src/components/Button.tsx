@@ -1,12 +1,40 @@
 import React from "react";
 import classNames from "classnames";
+import "./index.css";
 
-export interface ButtonProps {
-  type?: "primary" | "secondary" | "ghost" | "default";
+interface ButtonProps {
+  /**
+   * 按钮类型
+   * @default primary
+   */
+  type?: "primary" | "secondary";
+
+  /**
+   * 按钮大小
+   * @default medium
+   */
   size?: "small" | "medium" | "large";
+
+  /**
+   * 按钮文本
+   */
   label?: string;
+
+  /**
+   * 是否禁用
+   * @default false
+   */
   disabled?: boolean;
+
+  /**
+   * 是否加载中
+   * @default false
+   */
   loading?: boolean;
+
+  /**
+   * 点击事件
+   */
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
@@ -18,9 +46,6 @@ function calcTypeClass(type: ButtonProps["type"]): string {
       break;
     case "secondary":
       typeClass = "btn-secondary";
-      break;
-    case "ghost":
-      typeClass = "btn-ghost";
       break;
   }
 
@@ -41,14 +66,24 @@ function calcSizeClass(size: ButtonProps["size"]): string {
   return sizeClass;
 }
 
-export default function Button(props: ButtonProps): JSX.Element {
-  const { type = "primary", size = "medium", label = "", disabled, loading, onClick = () => {} } = props;
+/**
+ * 通用按钮组件
+ */
+export default function Button({
+  type = "primary",
+  size = "medium",
+  disabled = false,
+  loading = false,
+  ...props
+}: ButtonProps): JSX.Element {
+  const { label, onClick } = props;
   const btnClasses = classNames("btn", calcTypeClass(type), calcSizeClass(size), {
     "btn-disabled": disabled,
+    "btn-loading": loading,
   });
   return (
     <button onClick={onClick} className={btnClasses}>
-      {loading && <span className="loading loading-spinner" />}
+      {loading && <span>Loading...</span>}
       {!loading && label && <span>{label}</span>}
     </button>
   );
