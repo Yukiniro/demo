@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import Button from "./Button";
+// eslint-disable-next-line import/no-named-default
+import { default as Toggle } from "./Toggle";
 
 const meta = {
-  title: "components/Button",
-  component: Button,
+  title: "components/Toggle",
+  component: Toggle,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-} satisfies Meta<typeof Button>;
+} satisfies Meta<typeof Toggle>;
 
 export default meta;
 
@@ -16,32 +17,27 @@ type Story = StoryObj<typeof meta>;
 
 export const Type: Story = {
   args: {
-    label: "Button",
-  },
-};
-
-export const Label: Story = {
-  args: {
-    label: "Button",
+    type: "info",
+    checked: true,
   },
 };
 
 export const Size: Story = {
   args: {
-    label: "Button",
+    type: "info",
+    checked: true,
+  },
+};
+
+export const Checked: Story = {
+  args: {
+    checked: true,
+    type: "info",
   },
 };
 
 export const Disabled: Story = {
   args: {
     disabled: true,
-    label: "Button",
-  },
-};
-
-export const Loading: Story = {
-  args: {
-    loading: true,
-    label: "Button",
   },
 };
