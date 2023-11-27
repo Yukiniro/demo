@@ -1,10 +1,19 @@
+import React from "react";
 import classNames from "classnames";
 
-export interface ButtonProps {
+export interface ButtonProps
+  extends Omit<
+    React.HTMLAttributes<HTMLElement> &
+      React.ButtonHTMLAttributes<HTMLElement> &
+      React.AnchorHTMLAttributes<HTMLElement>,
+    "type"
+  > {
   type?: "primary" | "secondary" | "ghost" | "default";
   size?: "small" | "medium" | "large";
-  label: string;
-  onClick?: () => void;
+  label?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
 function calcTypeClass(type: ButtonProps["type"]): string {
@@ -38,12 +47,17 @@ function calcSizeClass(size: ButtonProps["size"]): string {
   return sizeClass;
 }
 
-export default function Button(props: ButtonProps) {
-  const { type = "primary", size = "medium", label, onClick = () => {} } = props;
-  const btnClasses = classNames("btn", calcTypeClass(type), calcSizeClass(size));
+function Button(props: ButtonProps): JSX.Element {
+  const { type = "primary", size = "medium", label = "", disabled, loading, onClick = () => {} } = props;
+  const btnClasses = classNames("btn", calcTypeClass(type), calcSizeClass(size), {
+    "btn-disabled": disabled,
+  });
   return (
     <button onClick={onClick} className={btnClasses}>
-      {label}
+      {loading && <span className="loading loading-spinner" />}
+      {!loading && label && <span>{label}</span>}
     </button>
   );
 }
+
+export default Button;

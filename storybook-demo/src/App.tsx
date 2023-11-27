@@ -1,5 +1,5 @@
-import reactLogo from "./assets/react.svg"
-import viteLogo from "./vite.svg"
+import reactLogo from "./assets/react.svg";
+import viteLogo from "./assets/vite.svg";
 
 function App() {
   return (
@@ -13,9 +13,12 @@ function App() {
         <div className="swap-off">
           <img src={reactLogo} className="w-36 h-36" alt="React logo" />
         </div>
+        <button className="btn btn-primary">
+          <span className="loading loading-spinner"></span>
+        </button>
       </label>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
