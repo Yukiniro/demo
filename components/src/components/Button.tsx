@@ -1,13 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-export interface ButtonProps
-  extends Omit<
-    React.HTMLAttributes<HTMLElement> &
-      React.ButtonHTMLAttributes<HTMLElement> &
-      React.AnchorHTMLAttributes<HTMLElement>,
-    "type"
-  > {
+export interface ButtonProps {
   type?: "primary" | "secondary" | "ghost" | "default";
   size?: "small" | "medium" | "large";
   label?: string;
@@ -47,7 +41,7 @@ function calcSizeClass(size: ButtonProps["size"]): string {
   return sizeClass;
 }
 
-function Button(props: ButtonProps): JSX.Element {
+export default function Button(props: ButtonProps): JSX.Element {
   const { type = "primary", size = "medium", label = "", disabled, loading, onClick = () => {} } = props;
   const btnClasses = classNames("btn", calcTypeClass(type), calcSizeClass(size), {
     "btn-disabled": disabled,
@@ -59,5 +53,3 @@ function Button(props: ButtonProps): JSX.Element {
     </button>
   );
 }
-
-export default Button;
