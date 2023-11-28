@@ -103,4 +103,13 @@ export default () => {
 };
 ```
 
-<API id="Button"></API>
+## API
+
+| 属性 | 说明 | 类型 | 默认值 | 版本 |
+| --- | --- | --- | --- | --- |
+| type | 按钮类型 | `primary` \| `secondary` | `primary` |  |
+| size | 按钮尺寸 | `large` \| `medium` \| `small` | `medium` |  |
+| label | 按钮内容 | `string` | - |  |
+| loading | 按钮等待状态 | `boolean` | `false` |  |
+| disabled | 按钮禁用状态 | `boolean` | `false` |  |
+| onClick | 点击按钮的回调函数 | `(event: React.MouseEvent<HTMLElement>) => void` | - |  |
