@@ -1,9 +1,9 @@
 import { defineConfig } from 'dumi';
 
 export default defineConfig({
-  outputPath: 'docs-dist',
+  outputPath: 'dumi-component-demo',
   themeConfig: {
-    name: 'components',
+    name: '组件库',
   },
   apiParser: {},
   resolve: {
