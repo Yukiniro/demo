@@ -6,3 +6,4 @@ node_modules
 .DS_Store
 dumi-component-demo
 docs-dist
+dumi-static
