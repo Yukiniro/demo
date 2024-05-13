@@ -214,7 +214,7 @@ const imageBitmapToYuv2 = (() => {
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pboBuffer);
 
     const yuv = new Uint8Array(c);
-    // const yuv = FJTypedArrayPool.get('Uint8Array', c);
+    // const yuv = FJTypedArrayPool.get("Uint8Array", c);
 
     gl.getBufferSubData(WebGL2RenderingContext.PIXEL_PACK_BUFFER, 0, yuv);
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
