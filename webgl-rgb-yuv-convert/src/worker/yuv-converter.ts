@@ -1,49 +1,3 @@
-// function rgb2yuv(rgba: Uint8Array): Uint8Array {
-//   const length = (rgba.length / 4) * 1.5;
-//   const yuv = new Uint8Array(length);
-//   for (let i = 0; i < rgba.length; i += 8) {
-//     const r1 = rgba[i];
-//     const g1 = rgba[i + 1];
-//     const b1 = rgba[i + 2];
-//     const r2 = rgba[i + 4];
-//     const g2 = rgba[i + 5];
-//     const b2 = rgba[i + 6];
-//     const y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
-//     const y2 = 0.299 * r2 + 0.587 * g2 + 0.114 * b2;
-//     const u = (-0.147 * (r1 + r2)) / 2 - (0.289 * (g1 + g2)) / 2 + (0.436 * (b1 + b2)) / 2;
-//     const v = (0.615 * (r1 + r2)) / 2 - (0.515 * (g1 + g2)) / 2 - (0.1 * (b1 + b2)) / 2;
-//     yuv[(i / 4) * 3] = y1;
-//     yuv[(i / 4) * 3 + 1] = y2;
-//     yuv[(i / 4) * 3 + 2] = u + 128;
-//     yuv[(i / 4) * 3 + 3] = v + 128;
-//   }
-//   return yuv as Uint8Array;
-// }
-
-function linearToSrgb(value: number): number {
-  if (value <= 0.0031308) {
-    return 12.92 * value;
-  } else {
-    return 1.055 * Math.pow(value, 1 / 2.4) - 0.055;
-  }
-}
-
-function rgb2yuv(rgba: Uint8Array, width: number, height: number): Uint8Array {
-  const yuv = new Uint8Array(width * height * 3);
-  for (let i = 0; i < width * height; i++) {
-    const r = linearToSrgb(rgba[i * 4] / 255);
-    const g = linearToSrgb(rgba[i * 4 + 1] / 255);
-    const b = linearToSrgb(rgba[i * 4 + 2] / 255);
-    const y = 0.299 * r + 0.587 * g + 0.114 * b;
-    const u = -0.14713 * r - 0.28886 * g + 0.436 * b;
-    const v = 0.615 * r - 0.51498 * g - 0.10001 * b;
-    yuv[i * 3] = Math.round(Math.max(0, Math.min(255, y * 255)));
-    yuv[i * 3 + 1] = Math.round(Math.max(0, Math.min(255, (u + 0.5) * 255)));
-    yuv[i * 3 + 2] = Math.round(Math.max(0, Math.min(255, (v + 0.5) * 255)));
-  }
-  return yuv;
-}
-
 function createShader(gl: WebGL2RenderingContext, type: GLenum, source: string) {
   const shader = gl.createShader(type);
   if (!shader) {
@@ -69,42 +23,43 @@ const imageBitmapToYuv2 = (() => {
   }
 
   const vertexShaderSource = `#version 300 es
-
-// an attribute is an input (in) to a vertex shader.
-// It will receive data from a buffer
-in vec2 a_position;
-in vec2 a_texCoord;
-uniform vec2 u_resolution;
-
-out vec2 v_texCoord;
-
-// all shaders have a main function
-void main() {
-
-  vec2 zeroToOne = a_position / u_resolution;
-  vec2 zeroToTwo = zeroToOne * 2.0;
-  vec2 clipSpace = zeroToTwo - 1.0;
-  gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-
-  v_texCoord = a_texCoord;
-  v_texCoord.y = 1.0 - v_texCoord.y; // 翻转 y 分量
-}
+  in vec2 vertexPos;
+  in vec2 vertexUV;
+  out vec2 texCoords;
+  void main() {
+      texCoords = vertexUV;
+      gl_Position = vec4(vertexPos, 0, 1);
+  }
 `;
 
   const fragmentShaderSource = `#version 300 es
-
-// fragment shaders don't have a default precision so we need
-// to pick one. highp is a good default. It means "high precision"
-
-precision highp float;
-uniform sampler2D u_image;
-in vec2 v_texCoord;
-
-out vec4 outColor;
-
-void main() {
-  outColor = texture(u_image, v_texCoord);
-}
+  precision mediump float;
+  
+  uniform sampler2D colorSampler;
+  uniform int bufferChannel; // 0=Y, 1=U, 2=V
+  in vec2 texCoords;
+  out float outColor;
+  
+  vec3 unmultAlpha(vec4 color) {
+      if (color.a == 0.) return vec3(0.);
+      return color.rgb / color.a;
+  }
+  
+  void main() {
+      vec2 flippedCoords = vec2(texCoords.x, 1. - texCoords.y);
+      vec3 rgb = unmultAlpha(texture(colorSampler, flippedCoords));
+  
+      float y = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
+      if (bufferChannel == 0) {
+          outColor = (219.0 * y + 16.0) / 255.0;
+      } else if (bufferChannel == 1) {
+          float u = (rgb.b - y) / 1.8556;
+          outColor = (224.0 * u + 128.0) / 255.0;
+      } else if (bufferChannel == 2) {
+          float v = (rgb.r - y) / 1.5748;
+          outColor = (224.0 * v + 128.0) / 255.0;
+      }
+  }
 `;
 
   // 创建顶点着色器
@@ -132,11 +87,11 @@ void main() {
   }
   gl.useProgram(program);
 
-  const positionLocation = gl.getAttribLocation(program, "a_position");
-  const texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
+  const positionLocation = gl.getAttribLocation(program, "vertexPos");
+  const texCoordAttributeLocation = gl.getAttribLocation(program, "vertexUV");
 
-  const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
-  const imageLocation = gl.getUniformLocation(program, "u_image");
+  const imageLocation = gl.getUniformLocation(program, "colorSampler");
+  const bufferChannel = gl.getUniformLocation(program, "bufferChannel");
 
   const positionBuffer = gl.createBuffer();
   gl.enableVertexAttribArray(positionLocation);
@@ -170,6 +125,21 @@ void main() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]), gl.STATIC_DRAW);
   }
 
+  const yInfo = {
+    texture: gl.createTexture(),
+    framebuffer: gl.createFramebuffer(),
+  };
+  const uInfo = {
+    texture: gl.createTexture(),
+    framebuffer: gl.createFramebuffer(),
+  };
+  const vInfo = {
+    texture: gl.createTexture(),
+    framebuffer: gl.createFramebuffer(),
+  };
+
+  let pboBuffer: WebGLBuffer | null = null;
+
   return (image: ImageBitmap): Uint8Array => {
     const { width, height } = image;
 
@@ -177,27 +147,79 @@ void main() {
     canvas.height = height;
     gl.viewport(0, 0, width, height);
 
+    const i = width / 2;
+    const n = height / 2;
+    const o = width * height;
+    const s = i * n;
+    const a = o + s;
+    const c = a + s;
+
+    if (!pboBuffer) {
+      pboBuffer = gl.createBuffer();
+      if (!pboBuffer) {
+        throw new Error("Create PBO buffer fail!");
+      }
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pboBuffer);
+      gl.bufferData(WebGL2RenderingContext.PIXEL_PACK_BUFFER, c, WebGL2RenderingContext.STREAM_READ);
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+    }
+
     // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    gl.uniform2f(resolutionLocation, width, height);
     gl.uniform1i(imageLocation, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     setRectangle(gl, 0, 0, width, height);
 
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    const fn = (
+      bufferChannelIndex: number,
+      width: number,
+      height: number,
+      offset: number,
+      info: {
+        texture: WebGLTexture | null;
+        framebuffer: WebGLFramebuffer | null;
+      },
+    ) => {
+      gl.viewport(0, 0, width, height);
 
-    // 创建一个 ArrayBuffer 来存储像素数据
-    const pixels = new Uint8Array(width * height * 4);
+      const frameBuffer = info.framebuffer || gl.createFramebuffer();
+      if (!frameBuffer) {
+        throw new Error("Create frame buffer fail!");
+      }
 
-    // 使用 readPixels 方法读取像素数据
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+      info.framebuffer = frameBuffer;
 
-    const yuv = rgb2yuv(pixels as Uint8Array, width, height);
+      gl.bindTexture(gl.TEXTURE_2D, null);
 
-    return yuv;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      gl.uniform1i(bufferChannel, bufferChannelIndex);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pboBuffer);
+      gl.readPixels(0, 0, width, height, gl.RED, gl.UNSIGNED_BYTE, offset);
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+    };
+
+    gl.activeTexture(gl.TEXTURE0 + 0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, width, height, 0, gl.RED, gl.UNSIGNED_BYTE, image);
+
+    fn(0, width, height, 0, yInfo);
+    fn(1, i, n, o, uInfo);
+    fn(2, i, n, a, vInfo);
+
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pboBuffer);
+
+    const yuv = new Uint8Array(c);
+    // const yuv = FJTypedArrayPool.get('Uint8Array', c);
+
+    gl.getBufferSubData(WebGL2RenderingContext.PIXEL_PACK_BUFFER, 0, yuv);
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+
+    return yuv as Uint8Array;
   };
 })();
 

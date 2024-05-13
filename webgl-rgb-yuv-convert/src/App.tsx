@@ -16,6 +16,7 @@ function App() {
     worker.onmessage = async event => {
       const { type, data } = event.data;
       if (type === "rgb2yuv") {
+        console.log(data);
         const yuvVideoFrame = new VideoFrame(data, {
           timestamp: 0,
           format: "I420",
@@ -23,33 +24,13 @@ function App() {
           codedHeight: imageBitmap.height,
         });
 
-        const options = { format: "RGBA" };
-
-        // @ts-expect-error
-        const bufSize = yuvVideoFrame.allocationSize(options);
-        const buffer = new Uint8ClampedArray(bufSize);
-
-        // @ts-expect-error
-        await yuvVideoFrame.copyTo(buffer, options);
-        const imageData = new ImageData(buffer, yuvVideoFrame.codedWidth, yuvVideoFrame.codedHeight);
-
-        // const rbgVideoFrame = new VideoFrame(buffer, {
-        //   timestamp: 0,
-        //   format: "RGBA",
-        //   codedWidth: imageBitmap.width,
-        //   codedHeight: imageBitmap.height,
-        // });
-
         const yuvCanvas = yuvCanvasRef.current;
         if (yuvCanvas) {
           yuvCanvas.width = imageBitmap.width;
           yuvCanvas.height = imageBitmap.height;
           const yuvContext = yuvCanvas.getContext("2d");
-          // yuvContext?.drawImage(rbgVideoFrame, 0, 0);
-          // yuvVideoFrame.close();
-          // rbgVideoFrame.close();
-
-          yuvContext?.putImageData(imageData, 0, 0);
+          yuvContext?.drawImage(yuvVideoFrame, 0, 0);
+          yuvVideoFrame.close();
         }
       }
 
