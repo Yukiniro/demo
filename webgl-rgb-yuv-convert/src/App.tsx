@@ -11,35 +11,36 @@ function App() {
       return;
     }
     const imageBitmap = await createImageBitmap(file);
+    const { width, height } = imageBitmap;
+
+    const rgbCanvas = rgbCanvasRef.current;
+    if (rgbCanvas) {
+      rgbCanvas.width = width;
+      rgbCanvas.height = height;
+      const rgbContext = rgbCanvas.getContext("2d");
+      rgbContext?.drawImage(imageBitmap, 0, 0);
+    }
+
     const worker = new Worker(new URL("./worker/yuv-converter.ts", import.meta.url));
-    worker.postMessage({ type: "rgb2yuv", data: { data: imageBitmap } });
+    worker.postMessage({ type: "rgb2yuv", data: { data: imageBitmap } }, [imageBitmap]);
     worker.onmessage = async event => {
       const { type, data } = event.data;
       if (type === "rgb2yuv") {
-        console.log(data);
         const yuvVideoFrame = new VideoFrame(data, {
           timestamp: 0,
           format: "I420",
-          codedWidth: imageBitmap.width,
-          codedHeight: imageBitmap.height,
+          codedWidth: width,
+          codedHeight: height,
         });
 
         const yuvCanvas = yuvCanvasRef.current;
         if (yuvCanvas) {
-          yuvCanvas.width = imageBitmap.width;
-          yuvCanvas.height = imageBitmap.height;
+          yuvCanvas.width = width;
+          yuvCanvas.height = height;
           const yuvContext = yuvCanvas.getContext("2d");
           yuvContext?.drawImage(yuvVideoFrame, 0, 0);
           yuvVideoFrame.close();
         }
-      }
-
-      const rgbCanvas = rgbCanvasRef.current;
-      if (rgbCanvas) {
-        rgbCanvas.width = imageBitmap.width;
-        rgbCanvas.height = imageBitmap.height;
-        const rgbContext = rgbCanvas.getContext("2d");
-        rgbContext?.drawImage(imageBitmap, 0, 0);
       }
     };
   };

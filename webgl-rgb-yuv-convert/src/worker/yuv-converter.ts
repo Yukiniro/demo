@@ -25,10 +25,17 @@ const imageBitmapToYuv2 = (() => {
   const vertexShaderSource = `#version 300 es
   in vec2 vertexPos;
   in vec2 vertexUV;
+
+  uniform vec2 u_resolution;
+
   out vec2 texCoords;
   void main() {
+      vec2 zeroToOne = vertexPos / u_resolution;
+      vec2 zeroToTwo = zeroToOne * 2.0;
+      vec2 clipSpace = zeroToTwo - 1.0;
+
+      gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
       texCoords = vertexUV;
-      gl_Position = vec4(vertexPos, 0, 1);
   }
 `;
 
@@ -90,6 +97,7 @@ const imageBitmapToYuv2 = (() => {
   const positionLocation = gl.getAttribLocation(program, "vertexPos");
   const texCoordAttributeLocation = gl.getAttribLocation(program, "vertexUV");
 
+  const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
   const imageLocation = gl.getUniformLocation(program, "colorSampler");
   const bufferChannel = gl.getUniformLocation(program, "bufferChannel");
 
@@ -109,7 +117,7 @@ const imageBitmapToYuv2 = (() => {
   gl.vertexAttribPointer(texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
   const texture = gl.createTexture();
-  gl.activeTexture(gl.TEXTURE0 + 0);
+  gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -168,9 +176,11 @@ const imageBitmapToYuv2 = (() => {
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    gl.uniform2f(resolutionLocation, width, height);
     gl.uniform1i(imageLocation, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     setRectangle(gl, 0, 0, width, height);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     const fn = (
       bufferChannelIndex: number,
@@ -184,33 +194,28 @@ const imageBitmapToYuv2 = (() => {
     ) => {
       gl.viewport(0, 0, width, height);
 
-      const frameBuffer = info.framebuffer || gl.createFramebuffer();
-      if (!frameBuffer) {
-        throw new Error("Create frame buffer fail!");
+      if (!info.framebuffer) {
+        info.framebuffer = gl.createFramebuffer();
       }
 
-      info.framebuffer = frameBuffer;
+      const frameBuffer = info.framebuffer;
 
       if (!info.texture) {
-        const textureTemp = gl.createTexture();
-        if (!textureTemp) {
-          throw new Error("Create texture fail!");
-        }
-        // gl.activeTexture(gl.TEXTURE0 + bufferChannelIndex + 1);
+        info.texture = gl.createTexture();
+
+        const textureTemp = info.texture;
         gl.bindTexture(gl.TEXTURE_2D, textureTemp);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, width, height, 0, gl.RED, gl.UNSIGNED_BYTE, image);
-        info.texture = textureTemp;
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, width, height, 0, gl.RED, gl.UNSIGNED_BYTE, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureTemp, 0);
       }
-      const textureTemp = info.texture;
 
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureTemp, 0);
-
       gl.uniform1i(bufferChannel, bufferChannelIndex);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -219,9 +224,8 @@ const imageBitmapToYuv2 = (() => {
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
     };
 
-    gl.activeTexture(gl.TEXTURE0 + 0);
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, width, height, 0, gl.RED, gl.UNSIGNED_BYTE, image);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.bindTexture(gl.TEXTURE_2D, null);
 
@@ -234,8 +238,10 @@ const imageBitmapToYuv2 = (() => {
     const yuv = new Uint8Array(c);
     // const yuv = FJTypedArrayPool.get("Uint8Array", c);
 
-    gl.getBufferSubData(WebGL2RenderingContext.PIXEL_PACK_BUFFER, 0, yuv);
+    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, yuv);
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+
+    image.close();
 
     return yuv as Uint8Array;
   };
