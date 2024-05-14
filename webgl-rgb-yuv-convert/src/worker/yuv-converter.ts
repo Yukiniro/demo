@@ -114,8 +114,8 @@ const imageBitmapToYuv2 = (() => {
 
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
   function setRectangle(gl: WebGL2RenderingContext, x: number, y: number, width: number, height: number) {
     const x1 = x;
@@ -126,16 +126,16 @@ const imageBitmapToYuv2 = (() => {
   }
 
   const yInfo = {
-    texture: gl.createTexture(),
-    framebuffer: gl.createFramebuffer(),
+    texture: null,
+    framebuffer: null,
   };
   const uInfo = {
-    texture: gl.createTexture(),
-    framebuffer: gl.createFramebuffer(),
+    texture: null,
+    framebuffer: null,
   };
   const vInfo = {
-    texture: gl.createTexture(),
-    framebuffer: gl.createFramebuffer(),
+    texture: null,
+    framebuffer: null,
   };
 
   let pboBuffer: WebGLBuffer | null = null;
@@ -191,10 +191,26 @@ const imageBitmapToYuv2 = (() => {
 
       info.framebuffer = frameBuffer;
 
-      gl.bindTexture(gl.TEXTURE_2D, null);
+      if (!info.texture) {
+        const textureTemp = gl.createTexture();
+        if (!textureTemp) {
+          throw new Error("Create texture fail!");
+        }
+        // gl.activeTexture(gl.TEXTURE0 + bufferChannelIndex + 1);
+        gl.bindTexture(gl.TEXTURE_2D, textureTemp);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, width, height, 0, gl.RED, gl.UNSIGNED_BYTE, image);
+        info.texture = textureTemp;
+      }
+      const textureTemp = info.texture;
 
+      gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureTemp, 0);
+
       gl.uniform1i(bufferChannel, bufferChannelIndex);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -205,7 +221,9 @@ const imageBitmapToYuv2 = (() => {
 
     gl.activeTexture(gl.TEXTURE0 + 0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, width, height, 0, gl.RED, gl.UNSIGNED_BYTE, image);
+    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, width, height, 0, gl.RED, gl.UNSIGNED_BYTE, image);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.bindTexture(gl.TEXTURE_2D, null);
 
     fn(0, width, height, 0, yInfo);
     fn(1, i, n, o, uInfo);
