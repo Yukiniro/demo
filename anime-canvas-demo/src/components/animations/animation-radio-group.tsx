@@ -14,7 +14,7 @@ export function AnimationRadioGroup(props: AnimationRadioGroupProps) {
       {list.map(item => {
         const { value, label } = item;
         return (
-          <div className="flex items-center space-x-2">
+          <div key={value} className="flex items-center space-x-2">
             <RadioGroupItem value={value} id={value} />
             <Label htmlFor={value}>{label}</Label>
           </div>
