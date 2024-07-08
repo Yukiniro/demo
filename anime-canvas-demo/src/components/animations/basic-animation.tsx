@@ -11,8 +11,11 @@ const canvasAniUpdate = (ctx: CanvasRenderingContext2D) => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.save();
   ctx.font = '60px ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
-  ctx.translate(288 + textWidth / 2 + translateX, 256 + textHeight / 2 + translateY);
+
+  ctx.translate(288 + textWidth / 2, 256 + textHeight / 2);
   ctx.rotate((Math.PI / 180) * rotate);
+  ctx.translate(translateX, translateY);
+
   ctx.fillText("hello world", -textWidth / 2, textHeight / 2);
   ctx.restore();
 };
