@@ -8,9 +8,17 @@ function App() {
     window.open(link, "_blank", "height=600,width=600,status=yes,top=200,left=400,toolbar=no,menubar=no,location=no");
   };
   const handleClickAsync = () => {
-    setTimeout(() => {
-      window.open(link, "_blank", "height=600,width=600,status=yes,top=200,left=400,toolbar=no,menubar=no,location=no");
-    }, 1000);
+    fetch("xxx").finally(() => {
+      setTimeout(() => {
+        (async () => {
+          window.open(
+            link,
+            "_blank",
+            "height=600,width=600,status=yes,top=200,left=400,toolbar=no,menubar=no,location=no",
+          );
+        })();
+      }, 3000);
+    });
   };
   return (
     <div className="flex items-center justify-center flex-col w-full h-full">
