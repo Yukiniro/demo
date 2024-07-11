@@ -5,20 +5,36 @@ import { calcTextSize } from "@/util";
 const AUTO_PALY = true;
 const TEXT = "hello world";
 
-const canvasAniTarget = { rotate: 0, translateX: 0, translateY: 0 };
+const canvasAniTarget = Array.from(TEXT)
+  .map((t, index) => {
+    if (t !== " ") {
+      return {
+        index,
+        scale: 2,
+        opacity: 0,
+        filter: "blur(6px)",
+      };
+    }
+  })
+  .filter(t => !!t);
 const canvasAniUpdate = (ctx: CanvasRenderingContext2D) => {
-  const { rotate, translateX, translateY } = canvasAniTarget;
-  const { width: textWidth, height: textHeight } = calcTextSize(ctx, TEXT);
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  ctx.save();
   ctx.font = '60px ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
+  console.clear();
 
-  ctx.translate(288 + textWidth / 2, 256 + textHeight / 2);
-  ctx.rotate((Math.PI / 180) * rotate);
-  ctx.translate(translateX, translateY);
-
-  ctx.fillText(TEXT, -textWidth / 2, textHeight / 2);
-  ctx.restore();
+  canvasAniTarget.forEach(target => {
+    const { scale, opacity, filter, index } = target;
+    const { width: textWidth } = calcTextSize(ctx, TEXT.slice(0, index + 1));
+    const { width: charWidth, height: charHeight } = calcTextSize(ctx, TEXT[index]);
+    ctx.save();
+    ctx.translate(288 + textWidth + charWidth / 2, 256 + charHeight / 2);
+    console.log(`x: ${288 + textWidth / 2 + charWidth / 2}`);
+    ctx.scale(scale, scale);
+    ctx.globalAlpha = opacity;
+    ctx.filter = filter;
+    ctx.fillText(TEXT[index], -(charWidth * scale) / 2, (charHeight * scale) / 2);
+    ctx.restore();
+  });
 };
 
 function TextAnimation() {
@@ -64,9 +80,12 @@ function TextAnimation() {
       canvasAni.current ||
       anime({
         targets: canvasAniTarget,
-        rotate: [0, 360],
-        translateX: [-100, 100],
-        translateY: [-100, 100],
+        scale: [2, 1],
+        opacity: [0, 1],
+        translateZ: 0,
+        filter: ["blur(6px)", "blur(0px)"],
+        easing: "linear",
+        delay: anime.stagger(200),
         duration: 2000,
         loop: true,
         autoplay: AUTO_PALY,
