@@ -4,6 +4,11 @@ import { calcTextSize } from "@/util";
 
 const AUTO_PALY = true;
 const TEXT = "hello world";
+const BASE_LEFT = 288;
+const BASE_TOP = 256;
+
+const charCanvas = new OffscreenCanvas(100, 100);
+const charCanvasPaddingRatio = 0.2;
 
 const canvasAniTarget = Array.from(TEXT)
   .map((t, index) => {
@@ -20,20 +25,35 @@ const canvasAniTarget = Array.from(TEXT)
 const canvasAniUpdate = (ctx: CanvasRenderingContext2D) => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.font = '60px ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
-  console.clear();
+
+  const { height: textHeight } = calcTextSize(ctx, TEXT);
+
+  let offset = 0;
 
   canvasAniTarget.forEach(target => {
     const { scale, opacity, filter, index } = target;
-    const { width: textWidth } = calcTextSize(ctx, TEXT.slice(0, index + 1));
-    const { width: charWidth, height: charHeight } = calcTextSize(ctx, TEXT[index]);
+    const { width: charWidth } = calcTextSize(ctx, TEXT[index]);
+
+    charCanvas.width = charWidth + charCanvasPaddingRatio * charWidth * 2;
+    charCanvas.height = textHeight + charCanvasPaddingRatio * textHeight * 2;
+    const charCtx = charCanvas.getContext("2d");
+
+    if (!charCtx) return;
+    charCtx.save();
+    charCtx.font = '60px ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
+    charCtx.translate(charWidth / 2, textHeight / 2);
+    charCtx.fillText(TEXT[index], -charWidth / 2, textHeight / 2);
+    charCtx.restore();
+
     ctx.save();
-    ctx.translate(288 + textWidth + charWidth / 2, 256 + charHeight / 2);
-    console.log(`x: ${288 + textWidth / 2 + charWidth / 2}`);
+    ctx.translate(BASE_LEFT + offset + charCanvas.width / 2, BASE_TOP + charCanvas.width / 2);
     ctx.scale(scale, scale);
     ctx.globalAlpha = opacity;
     ctx.filter = filter;
-    ctx.fillText(TEXT[index], -(charWidth * scale) / 2, (charHeight * scale) / 2);
+    ctx.drawImage(charCanvas, -charCanvas.width / 2, -charCanvas.width / 2);
     ctx.restore();
+
+    offset += charWidth;
   });
 };
 
@@ -57,8 +77,14 @@ function TextAnimation() {
         easing: "linear",
         delay: anime.stagger(200),
         duration: 2000,
-        loop: true,
+        // loop: true,
         autoplay: AUTO_PALY,
+        begin: () => {
+          console.log("dom ani begin", performance.now());
+        },
+        complete: () => {
+          console.log("dom ani complete", performance.now());
+        },
       });
   }, []);
 
@@ -87,10 +113,16 @@ function TextAnimation() {
         easing: "linear",
         delay: anime.stagger(200),
         duration: 2000,
-        loop: true,
+        // loop: true,
         autoplay: AUTO_PALY,
         update: () => {
           canvasAniUpdate(ctx);
+        },
+        begin: () => {
+          console.log("canvas ani begin", performance.now());
+        },
+        complete: () => {
+          console.log("canvas ani complete", performance.now());
         },
       });
   }, []);
@@ -98,7 +130,14 @@ function TextAnimation() {
   return (
     <>
       <div className="w-1/2 h-full border-black border-r relative">
-        <div ref={domRef} className="absolute font-serif text-6xl left-72 top-64 will-change-transform">
+        <div
+          ref={domRef}
+          style={{
+            left: BASE_LEFT,
+            top: BASE_TOP,
+          }}
+          className="absolute font-serif text-6xl will-change-transform"
+        >
           {Array.from(TEXT).map((char, i) => (
             <span className="inline-block" key={i}>
               {char}
