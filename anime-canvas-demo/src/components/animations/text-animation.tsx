@@ -4,21 +4,57 @@ import { calcTextSize } from "@/util";
 
 const AUTO_PALY = true;
 const TEXT = "hello world";
+const BASE_LEFT = 288;
+const BASE_TOP = 256;
 
-const canvasAniTarget = { rotate: 0, translateX: 0, translateY: 0 };
+const charCanvas = new OffscreenCanvas(100, 100);
+const charCanvasPaddingRatio = 0.2;
+
+const canvasAniTarget: { scale: number; opacity: number; filter: string; __value: string }[] = Array.from(TEXT).map(
+  value => {
+    return {
+      scale: 2,
+      opacity: 0,
+      filter: "blur(6px)",
+      __value: value,
+    };
+  },
+);
+
 const canvasAniUpdate = (ctx: CanvasRenderingContext2D) => {
-  const { rotate, translateX, translateY } = canvasAniTarget;
-  const { width: textWidth, height: textHeight } = calcTextSize(ctx, TEXT);
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  ctx.save();
   ctx.font = '60px ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
 
-  ctx.translate(288 + textWidth / 2, 256 + textHeight / 2);
-  ctx.rotate((Math.PI / 180) * rotate);
-  ctx.translate(translateX, translateY);
+  const { height: textHeight } = calcTextSize(ctx, TEXT);
 
-  ctx.fillText(TEXT, -textWidth / 2, textHeight / 2);
-  ctx.restore();
+  let offset = 0;
+
+  canvasAniTarget.forEach(target => {
+    const { scale, opacity, filter, __value } = target;
+    const subText = __value;
+    const { width: charWidth } = calcTextSize(ctx, subText);
+
+    charCanvas.width = charWidth + charCanvasPaddingRatio * charWidth * 2;
+    charCanvas.height = textHeight + charCanvasPaddingRatio * textHeight * 2;
+    const charCtx = charCanvas.getContext("2d");
+
+    if (!charCtx) return;
+    charCtx.save();
+    charCtx.font = '60px ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
+    charCtx.translate(charWidth / 2, textHeight / 2);
+    charCtx.fillText(subText, -charWidth / 2, textHeight / 2);
+    charCtx.restore();
+
+    ctx.save();
+    ctx.translate(BASE_LEFT + offset + charCanvas.width / 2, BASE_TOP + charCanvas.width / 2);
+    ctx.scale(scale, scale);
+    ctx.globalAlpha = opacity;
+    ctx.filter = filter;
+    ctx.drawImage(charCanvas, -charCanvas.width / 2, -charCanvas.width / 2);
+    ctx.restore();
+
+    offset += charWidth;
+  });
 };
 
 function TextAnimation() {
@@ -64,9 +100,12 @@ function TextAnimation() {
       canvasAni.current ||
       anime({
         targets: canvasAniTarget,
-        rotate: [0, 360],
-        translateX: [-100, 100],
-        translateY: [-100, 100],
+        scale: [2, 1],
+        opacity: [0, 1],
+        translateZ: 0,
+        filter: ["blur(6px)", "blur(0px)"],
+        easing: "linear",
+        delay: anime.stagger(200),
         duration: 2000,
         loop: true,
         autoplay: AUTO_PALY,
@@ -79,7 +118,14 @@ function TextAnimation() {
   return (
     <>
       <div className="w-1/2 h-full border-black border-r relative">
-        <div ref={domRef} className="absolute font-serif text-6xl left-72 top-64 will-change-transform">
+        <div
+          ref={domRef}
+          style={{
+            left: BASE_LEFT,
+            top: BASE_TOP,
+          }}
+          className="absolute font-serif text-6xl will-change-transform whitespace-pre"
+        >
           {Array.from(TEXT).map((char, i) => (
             <span className="inline-block" key={i}>
               {char}
