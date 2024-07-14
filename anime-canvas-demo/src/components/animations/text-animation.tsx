@@ -10,18 +10,17 @@ const BASE_TOP = 256;
 const charCanvas = new OffscreenCanvas(100, 100);
 const charCanvasPaddingRatio = 0.2;
 
-const canvasAniTarget = Array.from(TEXT)
-  .map((t, index) => {
-    if (t !== " ") {
-      return {
-        index,
-        scale: 2,
-        opacity: 0,
-        filter: "blur(6px)",
-      };
-    }
-  })
-  .filter(t => !!t);
+const canvasAniTarget: { scale: number; opacity: number; filter: string; __value: string }[] = Array.from(TEXT).map(
+  value => {
+    return {
+      scale: 2,
+      opacity: 0,
+      filter: "blur(6px)",
+      __value: value,
+    };
+  },
+);
+
 const canvasAniUpdate = (ctx: CanvasRenderingContext2D) => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.font = '60px ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
@@ -31,8 +30,9 @@ const canvasAniUpdate = (ctx: CanvasRenderingContext2D) => {
   let offset = 0;
 
   canvasAniTarget.forEach(target => {
-    const { scale, opacity, filter, index } = target;
-    const { width: charWidth } = calcTextSize(ctx, TEXT[index]);
+    const { scale, opacity, filter, __value } = target;
+    const subText = __value;
+    const { width: charWidth } = calcTextSize(ctx, subText);
 
     charCanvas.width = charWidth + charCanvasPaddingRatio * charWidth * 2;
     charCanvas.height = textHeight + charCanvasPaddingRatio * textHeight * 2;
@@ -42,7 +42,7 @@ const canvasAniUpdate = (ctx: CanvasRenderingContext2D) => {
     charCtx.save();
     charCtx.font = '60px ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
     charCtx.translate(charWidth / 2, textHeight / 2);
-    charCtx.fillText(TEXT[index], -charWidth / 2, textHeight / 2);
+    charCtx.fillText(subText, -charWidth / 2, textHeight / 2);
     charCtx.restore();
 
     ctx.save();
@@ -77,14 +77,8 @@ function TextAnimation() {
         easing: "linear",
         delay: anime.stagger(200),
         duration: 2000,
-        // loop: true,
+        loop: true,
         autoplay: AUTO_PALY,
-        begin: () => {
-          console.log("dom ani begin", performance.now());
-        },
-        complete: () => {
-          console.log("dom ani complete", performance.now());
-        },
       });
   }, []);
 
@@ -113,16 +107,10 @@ function TextAnimation() {
         easing: "linear",
         delay: anime.stagger(200),
         duration: 2000,
-        // loop: true,
+        loop: true,
         autoplay: AUTO_PALY,
         update: () => {
           canvasAniUpdate(ctx);
-        },
-        begin: () => {
-          console.log("canvas ani begin", performance.now());
-        },
-        complete: () => {
-          console.log("canvas ani complete", performance.now());
         },
       });
   }, []);
@@ -136,7 +124,7 @@ function TextAnimation() {
             left: BASE_LEFT,
             top: BASE_TOP,
           }}
-          className="absolute font-serif text-6xl will-change-transform"
+          className="absolute font-serif text-6xl will-change-transform whitespace-pre"
         >
           {Array.from(TEXT).map((char, i) => (
             <span className="inline-block" key={i}>

@@ -8,7 +8,8 @@ function calcTextSize(ctx: CanvasRenderingContext2D, text: string) {
   ctx.restore();
 
   return {
-    width: textWidth,
+    // 如果 textWidth 为 0，说明 text 为空字符串，此时使用 textMetrics.width 作为宽度
+    width: textWidth || textMetrics.width,
     height: textHeight,
     lineHeight,
   };

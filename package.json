@@ -16,5 +16,11 @@
   "bugs": {
     "url": "https://github.com/Yukiniro/demo/issues"
   },
-  "homepage": "https://github.com/Yukiniro/demo#readme"
+  "homepage": "https://github.com/Yukiniro/demo#readme",
+  "dependencies": {
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12"
+  }
 }
