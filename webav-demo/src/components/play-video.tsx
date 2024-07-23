@@ -70,6 +70,8 @@ function PlayVideo() {
         if (state === "done") {
           setCurTime(0);
           setIsPlaying(false);
+          cancelAnimationFrame(timerRef.current!);
+          timerRef.current = null;
           return;
         }
 
