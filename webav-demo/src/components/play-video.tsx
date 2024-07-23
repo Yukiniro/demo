@@ -36,6 +36,7 @@ function PlayVideo() {
     if (isPlaying) {
       cancelAnimationFrame(timerRef.current!);
       timerRef.current = null;
+      setIsPlaying(false);
     } else {
       let startTimestamp: DOMHighResTimeStamp = -1;
 
