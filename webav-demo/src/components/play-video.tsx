@@ -4,12 +4,14 @@ import videoUrl from "@/assets/video.mp4";
 import { MP4Clip } from "@webav/av-cliper";
 import { useEffect, useRef, useState } from "react";
 import { clamp } from "lodash-es";
+import { InputFile } from "./input-file";
 
 function PlayVideo() {
   const [curTime, setCurTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPending, setIsPending] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [url, setUrl] = useState<string | null>(videoUrl);
   const clipRef = useRef<MP4Clip | null>(null);
   const timerRef = useRef<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -20,7 +22,7 @@ function PlayVideo() {
   const handlePlayClick = async () => {
     if (!clipRef.current) {
       setIsPending(true);
-      const videoRes = await fetch(videoUrl);
+      const videoRes = await fetch(url as string);
       clipRef.current = new MP4Clip(videoRes.body!);
       await clipRef.current.ready;
 
@@ -52,6 +54,16 @@ function PlayVideo() {
     }
 
     setIsPlaying(!isPlaying);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    setUrl(url);
   };
 
   useEffect(() => {
@@ -101,9 +113,11 @@ function PlayVideo() {
   }, [curTime, duration]);
 
   const progress = clamp(Math.round((curTime / duration) * 100), 0, 100);
+  const showInputFile = url === videoUrl;
 
   return (
     <div className="flex items-center justify-center flex-col w-full h-full">
+      {showInputFile && <InputFile onChange={handleFileChange} className="my-2" id="video" label="Upload Video" />}
       <Button disabled={isPending} onClick={handlePlayClick}>
         {isPlaying ? "Pause" : "Play"}
       </Button>
