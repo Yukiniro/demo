@@ -1,4 +1,4 @@
-import { dir, write } from "opfs-tools";
+import { dir, write, file } from "opfs-tools";
 import { useEffect, useState } from "react";
 import { InputFile } from "./components/input-file";
 import { Skeleton } from "./components/ui/skeleton";
@@ -10,7 +10,7 @@ import { Button } from "./components/ui/button";
 function App() {
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState([]);
-  const [updateDir, setUpdateDir] = useState("/");
+  const [dirPath, setDirPath] = useState("/");
 
   useEffect(() => {
     (async () => {
@@ -23,15 +23,15 @@ function App() {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      const parseChildren = async children => {
+      const parseChildren = async (children, localPath) => {
         for (const child of children) {
           switch (child.kind) {
             case "dir":
-              await parseChildren(await child.children());
+              await parseChildren(await child.children(), child.path);
               break;
             case "file":
               list.push({
-                localPath: "/",
+                localPath,
                 fileName: child.name,
               });
               break;
@@ -39,7 +39,7 @@ function App() {
         }
       };
 
-      await parseChildren(children);
+      await parseChildren(children, "/");
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
@@ -52,24 +52,39 @@ function App() {
     const fileList = event.target.files;
     if (!fileList || fileList.length === 0) return;
 
-    const list = Array.from(fileList);
-    await Promise.all(list.map(file => write(`${updateDir}/${file.name}`, file.stream())));
+    const list: File[] = Array.from(fileList);
+    const genPath = (file: File) => {
+      return `${dirPath}/${file.name}`;
+    };
+
+    const promiseList = [];
+    for (const item of list) {
+      const path = genPath(item);
+      if (await file(path).exists()) {
+        continue;
+      }
+      promiseList.push(
+        write(path, item.stream()).then(() => {
+          return {
+            localPath: dirPath || "/",
+            fileName: item.name,
+          };
+        }),
+      );
+    }
+
+    const newList = await Promise.all(promiseList);
+    if (newList.length === 0) {
+      return;
+    }
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    setFiles([
-      ...files,
-      ...list.map(file => {
-        return {
-          localPath: "/",
-          fileName: file.name,
-        };
-      }),
-    ]);
+    setFiles([...files, ...newList]);
   };
 
   const handleDirChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUpdateDir(event.target.value);
+    setDirPath(event.target.value);
   };
 
   const handleClear = async () => {
@@ -99,17 +114,19 @@ function App() {
   }
 
   return (
-    <div className="flex items-center justify-center flex-col w-full h-full">
-      <h1 className="text-6xl py-16  w-full text-center font-mono font-bold fixed top-0">OPFS Demo</h1>
-      <Button className="mb-6" onClick={handleClear}>
-        Clear
-      </Button>
-      <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Label htmlFor="text">Upload Dir</Label>
-        <Input type="text" id="text" placeholder="Upload Dir" onChange={handleDirChange} value={updateDir} />
-      </div>
-      <InputFile onChange={handleFileChange} className="mb-6" />
+    <div className="flex items-center justify-start flex-col w-full h-full">
+      <h1 className="text-6xl py-16  w-full text-center font-mono font-bold">OPFS Demo</h1>
       <div>
+        <Button className="mb-6 block ml-auto mr-auto" onClick={handleClear}>
+          Clear
+        </Button>
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="text">Upload Dir</Label>
+          <Input type="text" id="text" placeholder="Upload Dir" onChange={handleDirChange} value={dirPath} />
+        </div>
+        <InputFile onChange={handleFileChange} className="mb-6" />
+      </div>
+      <div className="w-full max-w-sm flex justify-start">
         <ToggleFileTree
           list={createFileTree(files) as Directory}
           handleFileClick={handleFileClick}
