@@ -15,7 +15,7 @@ const animations = [
 ];
 
 function App() {
-  const [animation, setAnimation] = useState(animations[1].value);
+  const [animation, setAnimation] = useState(animations[0].value);
   return (
     <div className="flex items-center justify-center flex-col w-full h-full">
       <h1 className="text-6xl py-16  w-full text-center font-mono font-bold">WeAV Demo</h1>
