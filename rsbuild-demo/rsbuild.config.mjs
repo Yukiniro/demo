@@ -6,11 +6,11 @@ export default defineConfig({
   source: {
     entry: {
       main: "./src/index.jsx",
-    }
+    },
   },
   output: {
     filenameHash: false,
-    legalComments: 'none',
+    legalComments: "none",
   },
   performance: {
     chunkSplit: {

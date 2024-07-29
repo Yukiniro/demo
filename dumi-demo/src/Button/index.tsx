@@ -1,19 +1,19 @@
-import React from "react";
-import classNames from "classnames";
-import "./index.css";
+import classNames from 'classnames';
+import React from 'react';
+import './index.css';
 
 interface ButtonProps {
   /**
    * 按钮类型
    * @default primary
    */
-  type?: "primary" | "secondary";
+  type?: 'primary' | 'secondary';
 
   /**
    * 按钮大小
    * @default medium
    */
-  size?: "small" | "medium" | "large";
+  size?: 'small' | 'medium' | 'large';
 
   /**
    * 按钮文本
@@ -38,28 +38,28 @@ interface ButtonProps {
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-function calcTypeClass(type: ButtonProps["type"]): string {
-  let typeClass = "";
+function calcTypeClass(type: ButtonProps['type']): string {
+  let typeClass = '';
   switch (type) {
-    case "primary":
-      typeClass = "btn-primary";
+    case 'primary':
+      typeClass = 'btn-primary';
       break;
-    case "secondary":
-      typeClass = "btn-secondary";
+    case 'secondary':
+      typeClass = 'btn-secondary';
       break;
   }
 
   return typeClass;
 }
 
-function calcSizeClass(size: ButtonProps["size"]): string {
-  let sizeClass = "";
+function calcSizeClass(size: ButtonProps['size']): string {
+  let sizeClass = '';
   switch (size) {
-    case "small":
-      sizeClass = "btn-sm";
+    case 'small':
+      sizeClass = 'btn-sm';
       break;
-    case "large":
-      sizeClass = "btn-lg";
+    case 'large':
+      sizeClass = 'btn-lg';
       break;
   }
 
@@ -70,17 +70,22 @@ function calcSizeClass(size: ButtonProps["size"]): string {
  * 通用按钮组件
  */
 export default function Button({
-  type = "primary",
-  size = "medium",
+  type = 'primary',
+  size = 'medium',
   disabled = false,
   loading = false,
   ...props
 }: ButtonProps): JSX.Element {
   const { label, onClick } = props;
-  const btnClasses = classNames("btn", calcTypeClass(type), calcSizeClass(size), {
-    "btn-disabled": disabled,
-    "btn-loading": loading,
-  });
+  const btnClasses = classNames(
+    'btn',
+    calcTypeClass(type),
+    calcSizeClass(size),
+    {
+      'btn-disabled': disabled,
+      'btn-loading': loading,
+    },
+  );
   return (
     // eslint-disable-next-line react/button-has-type
     <button onClick={onClick} className={btnClasses}>

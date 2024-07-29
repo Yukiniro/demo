@@ -1,5 +1,5 @@
-import reactLogo from "./assets/react.svg"
-import viteLogo from "./vite.svg"
+import reactLogo from "./assets/react.svg";
+import viteLogo from "./vite.svg";
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         </div>
       </label>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
