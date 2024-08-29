@@ -6,12 +6,14 @@ import { createShader } from "./utils";
 
 const App = () => {
   const canvasRef = useRef(null);
+  const canvas2dRef = useRef(null);
   const videoRef = useRef(null);
   const timerRef = useRef(null);
 
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
+    const canvas2d = canvas2dRef.current;
     const gl = canvas.getContext("webgl2");
 
     if (!gl) {
@@ -62,8 +64,14 @@ const App = () => {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
     function render() {
+      if (!video.videoWidth || !video.videoHeight) {
+        requestAnimationFrame(render);
+        return;
+      }
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+      canvas2d.width = video.videoWidth;
+      canvas2d.height = video.videoHeight;
       gl.viewport(0, 0, canvas.width, canvas.height);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -78,6 +86,9 @@ const App = () => {
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
+      const ctx = canvas2d.getContext("2d");
+      ctx.drawImage(video, 0, 0);
+
       requestAnimationFrame(render);
     }
 
@@ -90,8 +101,9 @@ const App = () => {
     <div className="content">
       <h1>Video Canvas Preview</h1>
       <div className="flex">
-        <video ref={videoRef} src={videoUrl} style={{ width: "45%" }} muted autoPlay loop controls />
-        <canvas ref={canvasRef} style={{ width: "45%" }} />
+        <video ref={videoRef} src={videoUrl} style={{ width: "33%" }} muted autoPlay loop controls />
+        <canvas ref={canvasRef} style={{ width: "33%" }} />
+        <canvas ref={canvas2dRef} style={{ width: "33%" }} />
       </div>
     </div>
   );
