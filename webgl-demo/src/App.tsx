@@ -79,6 +79,8 @@ function App() {
     const program = createProgram(gl, vertexShader, fragmentShader);
     if (!program) return;
 
+    gl.useProgram(program);
+
     // 查找属性位置
     const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
     const colorUniformLocation = gl.getUniformLocation(program, "u_color");
@@ -91,13 +93,6 @@ function App() {
     const positions = [0, 0, 0, 0.5, 0.7, 0];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
-    // 渲染
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    gl.useProgram(program);
-
     // 启用属性
     gl.enableVertexAttribArray(positionAttributeLocation);
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -105,6 +100,11 @@ function App() {
 
     // 设置颜色
     gl.uniform4f(colorUniformLocation, Math.random(), Math.random(), Math.random(), 1);
+
+    // 渲染
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     // 绘制三角形
     gl.drawArrays(gl.TRIANGLES, 0, 3);
