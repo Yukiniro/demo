@@ -52,7 +52,7 @@ function SelectImage(props: SelectImageProps) {
   return (
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    <Select defaultValue={IMAGE_INFO[0].name} style={{ width: 120 }} onChange={handleChange}>
+    <Select defaultValue={IMAGE_INFO[1].name} style={{ width: 120 }} onChange={handleChange}>
       {IMAGE_INFO.map(item => (
         <Select.Option key={item.name} value={item.name}>
           {item.name}
@@ -63,3 +63,4 @@ function SelectImage(props: SelectImageProps) {
 }
 
 export default SelectImage;
+export { IMAGE_INFO };

@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { createShader, createTexture, loadImage } from "./utils";
-import originalMountImageUrl from "./assets/mount.jpg";
-import depthMountImageUrl from "./assets/mount-map.jpg";
 import useOnceEffect from "./hooks/useOnceEffect";
-import SelectImage from "./components/SelectImage";
+import SelectImage, { IMAGE_INFO } from "./components/SelectImage";
 import { fragmentShaderSource, vertexShaderSource } from "./gl";
+import { Slider } from "@douyinfe/semi-ui";
+
+const BASE_CANVAS_HEIGHT = 500;
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasDepthRef = useRef<HTMLCanvasElement>(null);
 
-  const [originalImageUrl, setOriginalImageUrl] = useState(originalMountImageUrl);
-  const [depthImageUrl, setDepthImageUrl] = useState(depthMountImageUrl);
+  const [originalImageUrl, setOriginalImageUrl] = useState(IMAGE_INFO[1].originalImageUrl);
+  const [depthImageUrl, setDepthImageUrl] = useState(IMAGE_INFO[1].depthImageUrl);
+  const [depthImageOpacity, setDepthImageOpacity] = useState(0);
 
   const texture0Ref = useRef<WebGLTexture | null>(null);
   const texture1Ref = useRef<WebGLTexture | null>(null);
@@ -110,14 +113,20 @@ function App() {
       const image0 = await loadImage(originalImageUrl);
       const image1 = await loadImage(depthImageUrl);
 
+      canvasDepthRef!.current!.height = BASE_CANVAS_HEIGHT;
+      canvasDepthRef!.current!.width = (image1.width / image1.height) * BASE_CANVAS_HEIGHT;
+      canvasDepthRef!
+        .current!.getContext("2d")
+        ?.drawImage(image1, 0, 0, canvasDepthRef!.current!.width, canvasDepthRef!.current!.height);
+
       texture0Ref.current = createTexture(gl);
       texture1Ref.current = createTexture(gl);
 
       const texture0 = texture0Ref.current;
       const texture1 = texture1Ref.current;
 
-      canvas.height = 600;
-      canvas.width = (image0.width / image0.height) * 600;
+      canvas.height = BASE_CANVAS_HEIGHT;
+      canvas.width = (image0.width / image0.height) * BASE_CANVAS_HEIGHT;
 
       // 获取 uniform 位置
       const mouseUniformLocation = gl.getUniformLocation(program, "u_mouse");
@@ -128,14 +137,16 @@ function App() {
         gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
       }
       if (thresholdUniformLocation) {
-        gl.uniform2f(thresholdUniformLocation, 30, 25); // 调整这些值以获得所需的效果
+        gl.uniform2f(thresholdUniformLocation, 15, 25); // 调整这些值以获得所需的效果
       }
 
       // 鼠标移动事件处理函数
       const handleMouseMove = (event: MouseEvent) => {
         const rect = canvas.getBoundingClientRect();
-        const x = 1.0 - (event.clientX - rect.left) / canvas.width;
-        const y = 1.0 - (event.clientY - rect.top) / canvas.height; // 翻转 Y 坐标
+        // 将 x 坐标归一化到 -1 到 1 的范围
+        const x = ((event.clientX - rect.left) / canvas.width) * 2 - 1;
+        // 将 y 坐标归一化到 -1 到 1 的范围
+        const y = ((event.clientY - rect.top) / canvas.height) * 2 - 1;
 
         // 设置 uniform 变量
         if (mouseUniformLocation) {
@@ -148,8 +159,21 @@ function App() {
         gl.drawArrays(gl.TRIANGLES, 0, 6);
       };
 
+      const handleMouseLeave = () => {
+        // 设置 uniform 变量
+        if (mouseUniformLocation) {
+          gl.uniform2f(mouseUniformLocation, 0, 0);
+        }
+
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      };
+
       // 添加鼠标移动事件监听器
       canvas.addEventListener("mousemove", handleMouseMove);
+      canvas.addEventListener("mouseleave", handleMouseLeave);
 
       gl.viewport(0, 0, canvas.width, canvas.height);
 
@@ -196,6 +220,12 @@ function App() {
       const image0 = await loadImage(originalImageUrl);
       const image1 = await loadImage(depthImageUrl);
 
+      canvasDepthRef!.current!.height = BASE_CANVAS_HEIGHT;
+      canvasDepthRef!.current!.width = (image1.width / image1.height) * BASE_CANVAS_HEIGHT;
+      canvasDepthRef!
+        .current!.getContext("2d")
+        ?.drawImage(image1, 0, 0, canvasDepthRef!.current!.width, canvasDepthRef!.current!.height);
+
       const texture0 = texture0Ref.current;
       const texture1 = texture1Ref.current;
 
@@ -207,8 +237,8 @@ function App() {
       gl.bindTexture(gl.TEXTURE_2D, texture1);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image1);
 
-      canvas.height = 600;
-      canvas.width = (image0.width / image0.height) * 600;
+      canvas.height = BASE_CANVAS_HEIGHT;
+      canvas.width = (image0.width / image0.height) * BASE_CANVAS_HEIGHT;
 
       gl.viewport(0, 0, canvas.width, canvas.height);
 
@@ -233,11 +263,31 @@ function App() {
   return (
     <div className="container mx-auto h-screen flex justify-center items-center">
       <h1 className="text-6xl pb-12 fixed top-16 left-1/2 -translate-x-1/2">Fake 3D</h1>
-      <div className="flex gap-16">
-        <canvas ref={canvasRef}></canvas>
+      <div className="flex gap-8">
+        <div className="relative">
+          <canvas ref={canvasRef}></canvas>
+          <canvas
+            ref={canvasDepthRef}
+            className="absolute top-0 left-0 z-10 pointer-events-none"
+            style={{ opacity: depthImageOpacity }}
+          ></canvas>
+        </div>
         <div className="flex flex-col gap-4">
-          <div>
+          <div className="flex justify-between items-center gap-4 w-80">
             图片： <SelectImage handleChange={handleChange} />
+          </div>
+          <div className="flex justify-between items-center gap-4 w-80">
+            深度图透明度:
+            <Slider
+              min={0}
+              max={1}
+              value={depthImageOpacity}
+              step={0.01}
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-expect-error
+              onChange={setDepthImageOpacity}
+              className="w-40"
+            />
           </div>
         </div>
       </div>
