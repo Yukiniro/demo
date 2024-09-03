@@ -28,7 +28,7 @@ function App() {
 
     const fragmentShaderSource = `#version 300 es
     precision mediump float;
-    uniform vec4 resolution;
+    uniform vec2 u_resolution;
     in vec2 v_texCoord;
     uniform sampler2D u_texture;
     uniform vec2 u_mouse;
@@ -36,19 +36,13 @@ function App() {
     uniform sampler2D image0;
     uniform sampler2D image1;
     out vec4 outColor;
-
-    vec2 mirrored(vec2 v) {
-      vec2 m = mod(v, 2.);
-      return mix(m, 2.0 - m, step(1.0, m));
-    }
       
     void main() {
-      vec2 uv = gl_FragCoord.xy / resolution.xy ;
-      vec2 vUv = (uv - vec2(0.5)) * resolution.zw + vec2(0.5);
-      vUv.y = 1. - vUv.y;
-      vec4 tex1 = texture(image1, mirrored(vUv));
-      vec2 fake3d = vec2(vUv.x + (tex1.r - 0.5) * u_mouse.x / u_threshold.x, vUv.y + (tex1.r - 0.5) * u_mouse.y / u_threshold.y);
-      outColor = texture(image0, mirrored(fake3d));
+      vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+      uv.y = 1. - uv.y;
+      vec4 tex1 = texture(image1, uv);
+      vec2 fake3d = vec2(uv.x + (tex1.r - 0.5) * u_mouse.x / u_threshold.x, uv.y + (tex1.r - 0.5) * u_mouse.y / u_threshold.y);
+      outColor = texture(image0, fake3d);
     }`;
 
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
@@ -135,14 +129,11 @@ function App() {
       canvasRef.current!.height = (image0.height / image0.width) * 800;
       // 获取 uniform 位置
       const mouseUniformLocation = gl.getUniformLocation(program, "u_mouse");
-      const resolutionUniformLocation = gl.getUniformLocation(program, "resolution");
+      const resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
       const thresholdUniformLocation = gl.getUniformLocation(program, "u_threshold");
 
       if (resolutionUniformLocation) {
-        const imageAspect = image0.naturalHeight / image0.naturalWidth;
-        const a1 = (canvasRef.current!.width / canvasRef.current!.height) * imageAspect;
-        const a2 = 1;
-        gl.uniform4f(resolutionUniformLocation, canvas.width, canvas.height, a1, a2);
+        gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
       }
       if (thresholdUniformLocation) {
         gl.uniform2f(thresholdUniformLocation, 15, 25); // 调整这些值以获得所需的效果
@@ -151,7 +142,7 @@ function App() {
       // 鼠标移动事件处理函数
       const handleMouseMove = (event: MouseEvent) => {
         const rect = canvas.getBoundingClientRect();
-        const x = (event.clientX - rect.left) / canvas.width;
+        const x = 1.0 - (event.clientX - rect.left) / canvas.width;
         const y = 1.0 - (event.clientY - rect.top) / canvas.height; // 翻转 Y 坐标
 
         // 设置 uniform 变量
