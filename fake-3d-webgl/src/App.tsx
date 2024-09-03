@@ -1,11 +1,23 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createShader, createTexture, loadImage } from "./utils";
-import originalImageUrl from "./assets/mount.jpg";
-import depthImageUrl from "./assets/mount-map.jpg";
+import originalMountImageUrl from "./assets/mount.jpg";
+import depthMountImageUrl from "./assets/mount-map.jpg";
 import useOnceEffect from "./hooks/useOnceEffect";
+import SelectImage from "./components/SelectImage";
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [originalImageUrl, setOriginalImageUrl] = useState(originalMountImageUrl);
+  const [depthImageUrl, setDepthImageUrl] = useState(depthMountImageUrl);
+
+  const texture0 = useRef<WebGLTexture | null>(null);
+  const texture1 = useRef<WebGLTexture | null>(null);
+
+  const handleChange = (originalImageUrl: string, depthImageUrl: string): void => {
+    setOriginalImageUrl(originalImageUrl);
+    setDepthImageUrl(depthImageUrl);
+  };
 
   useOnceEffect(() => {
     const canvas = canvasRef.current;
@@ -122,8 +134,8 @@ function App() {
       const image0 = await loadImage(originalImageUrl);
       const image1 = await loadImage(depthImageUrl);
 
-      const texture0 = createTexture(gl);
-      const texture1 = createTexture(gl);
+      texture0.current = createTexture(gl);
+      texture1.current = createTexture(gl);
 
       canvasRef.current!.width = 800;
       canvasRef.current!.height = (image0.height / image0.width) * 800;
@@ -136,7 +148,7 @@ function App() {
         gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
       }
       if (thresholdUniformLocation) {
-        gl.uniform2f(thresholdUniformLocation, 15, 25); // 调整这些值以获得所需的效果
+        gl.uniform2f(thresholdUniformLocation, 30, 25); // 调整这些值以获得所需的效果
       }
 
       // 鼠标移动事件处理函数
@@ -170,11 +182,11 @@ function App() {
       gl.uniform1i(image1Location, 1); // texture unit 1
 
       gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texture0);
+      gl.bindTexture(gl.TEXTURE_2D, texture0.current);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image0);
 
       gl.activeTexture(gl.TEXTURE1);
-      gl.bindTexture(gl.TEXTURE_2D, texture1);
+      gl.bindTexture(gl.TEXTURE_2D, texture1.current);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image1);
 
       gl.clearColor(0, 0, 0, 0);
@@ -184,10 +196,52 @@ function App() {
     })();
   }, []);
 
+  useEffect(() => {
+    if (!originalImageUrl || !depthImageUrl) {
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const gl = canvas.getContext("webgl2");
+    if (!gl) {
+      console.error("WebGL2 not supported");
+      return;
+    }
+
+    (async () => {
+      const image0 = await loadImage(originalImageUrl);
+      const image1 = await loadImage(depthImageUrl);
+
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture0.current);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image0);
+
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, texture1.current);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image1);
+
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    })();
+  }, [depthImageUrl, originalImageUrl]);
+
   return (
     <div className="container mx-auto h-screen flex flex-col justify-center items-center">
-      <h1 className="text-6xl pb-32">Fake 3D</h1>
-      <canvas ref={canvasRef}></canvas>
+      <h1 className="text-6xl pb-12">Fake 3D</h1>
+      <div className="flex gap-16">
+        <canvas ref={canvasRef}></canvas>
+        <div className="flex flex-col gap-4">
+          <div>
+            图片： <SelectImage handleChange={handleChange} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
