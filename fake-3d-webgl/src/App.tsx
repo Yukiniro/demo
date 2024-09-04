@@ -11,8 +11,8 @@ function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasDepthRef = useRef<HTMLCanvasElement>(null);
 
-  const [originalImageUrl, setOriginalImageUrl] = useState(IMAGE_INFO[1].originalImageUrl);
-  const [depthImageUrl, setDepthImageUrl] = useState(IMAGE_INFO[1].depthImageUrl);
+  const [originalImageUrl, setOriginalImageUrl] = useState(IMAGE_INFO[4].originalImageUrl);
+  const [depthImageUrl, setDepthImageUrl] = useState(IMAGE_INFO[4].depthImageUrl);
   const [depthImageOpacity, setDepthImageOpacity] = useState(0);
 
   const texture0Ref = useRef<WebGLTexture | null>(null);
