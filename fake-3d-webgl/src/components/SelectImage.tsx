@@ -8,6 +8,8 @@ import originalLadyImageUrl from "../assets/lady.jpg";
 import depthLadyImageUrl from "../assets/lady-map.jpg";
 import originalDogImageUrl from "../assets/dog.jpg";
 import depthDogImageUrl from "../assets/dog-map.png";
+import originalDogPhotoImageUrl from "../assets/dog-photo.jpg";
+import depthDogPhotoImageUrl from "../assets/dog-depth-map.jpg";
 import { Select } from "@douyinfe/semi-ui";
 
 const IMAGE_INFO = [
@@ -35,6 +37,11 @@ const IMAGE_INFO = [
     name: "dog",
     originalImageUrl: originalDogImageUrl,
     depthImageUrl: depthDogImageUrl,
+  },
+  {
+    name: "dog photo",
+    originalImageUrl: originalDogPhotoImageUrl,
+    depthImageUrl: depthDogPhotoImageUrl,
   },
 ];
 

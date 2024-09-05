@@ -5,7 +5,7 @@ import SelectImage, { IMAGE_INFO } from "./components/SelectImage";
 import { fragmentShaderSource, vertexShaderSource } from "./gl";
 import { Slider } from "@douyinfe/semi-ui";
 
-const BASE_CANVAS_HEIGHT = 500;
+const BASE_CANVAS_HEIGHT = 650;
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -262,7 +262,7 @@ function App() {
 
   return (
     <div className="container mx-auto h-screen flex justify-center items-center">
-      <h1 className="text-6xl pb-12 fixed top-16 left-1/2 -translate-x-1/2">Fake 3D</h1>
+      <h1 className="text-6xl pb-12 fixed top-8 left-1/2 -translate-x-1/2">Fake 3D</h1>
       <div className="flex gap-8">
         <div className="relative">
           <canvas ref={canvasRef}></canvas>
