@@ -1,9 +1,9 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useTextureStore } from "../store/use-texture-store";
 import { useToolsStore } from "../store/use-tools-store";
 import LinearControl from "./linear-control";
 import Presets from "./presets";
-import SelectImage from "./select-image";
+import SelectImage, { IMAGE_INFO } from "./select-image";
 import { Slider } from "@douyinfe/semi-ui";
 
 function Tools() {
@@ -23,9 +23,12 @@ function Tools() {
     updateEdgeDilation: state.updateEdgeDilation,
   }));
 
-  const handleChange = (originalImageUrl: string, depthImageUrl: string): void => {
-    setImages(originalImageUrl, depthImageUrl);
-  };
+  const handleChange = useCallback(
+    (originalImageUrl: string, depthImageUrl: string): void => {
+      setImages(originalImageUrl, depthImageUrl);
+    },
+    [setImages],
+  );
 
   const commonSettings = useMemo(() => {
     return [
@@ -44,6 +47,10 @@ function Tools() {
     updateEdgeDilation,
     updateFocus,
   ]);
+
+  useEffect(() => {
+    handleChange(IMAGE_INFO[4].originalImageUrl, IMAGE_INFO[4].depthImageUrl);
+  }, [handleChange]);
 
   return (
     <div className="flex flex-col w-[400px] h-full absolute right-0 py-6 overflow-y-scroll">

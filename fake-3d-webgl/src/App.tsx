@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useTextureStore } from "./store/use-texture-store";
+import { useToolsStore } from "./store/use-tools-store";
 import Layout from "./components/layout";
 import Error from "./components/error";
 import { Divider } from "@douyinfe/semi-ui";
@@ -15,6 +16,7 @@ function App() {
     init: state.init,
     updateViewSize: state.updateViewSize,
   }));
+  const triggerAnimationRender = useToolsStore(state => state.triggerAnimationRender);
 
   useEffect(() => init(), [init]);
   useEffect(() => {
@@ -24,11 +26,13 @@ function App() {
     }
     const { width, height } = box.getBoundingClientRect();
     updateViewSize(width, height);
-  }, [updateViewSize]);
+    triggerAnimationRender();
+  }, [updateViewSize, triggerAnimationRender]);
 
   useEffect(() => {
     canvasRef.current && bindCanvas(canvasRef.current);
-  });
+    triggerAnimationRender();
+  }, [triggerAnimationRender]);
 
   if (pending) {
     return <Layout>Loading...</Layout>;
