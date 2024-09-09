@@ -13,6 +13,12 @@ let imageMapUniformLocation: WebGLUniformLocation | null = null;
 let originalTexture: WebGLTexture | null = null;
 let depthMapTexture: WebGLTexture | null = null;
 
+export interface Point {
+  x: number;
+  y: number;
+  z: number;
+}
+
 function initRenderStore() {
   canvas = canvas || new OffscreenCanvas(1, 1);
   gl = canvas.getContext("webgl2");
