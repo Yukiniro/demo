@@ -1,7 +1,8 @@
 import { fragmentShaderSource, vertexShaderSource } from "../gl";
-import { createShader } from "../utils";
+import { createShader, createTexture } from "../utils";
 
-let gl: WebGL2RenderingContext;
+let canvas: OffscreenCanvas | null = null;
+let gl: WebGL2RenderingContext | null = null;
 let program: WebGLProgram | null = null;
 let resolutionUniformLocation: WebGLUniformLocation | null = null;
 let offsetUniformLocation: WebGLUniformLocation | null = null;
@@ -9,13 +10,15 @@ let focusUniformLocation: WebGLUniformLocation | null = null;
 let enlargeUniformLocation: WebGLUniformLocation | null = null;
 let imageUniformLocation: WebGLUniformLocation | null = null;
 let imageMapUniformLocation: WebGLUniformLocation | null = null;
+let originalTexture: WebGLTexture | null = null;
+let depthMapTexture: WebGLTexture | null = null;
 
-function initRenderStore(context: WebGL2RenderingContext) {
-  if (!context) {
+function initRenderStore() {
+  canvas = canvas || new OffscreenCanvas(1, 1);
+  gl = canvas.getContext("webgl2");
+  if (!gl) {
     throw new Error("WebGL2 not supported");
   }
-
-  gl = context;
 
   const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
   const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
@@ -28,8 +31,12 @@ function initRenderStore(context: WebGL2RenderingContext) {
     throw new Error("Failed to create program");
   }
 
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
+  const attachedShaders = gl.getAttachedShaders(program);
+  if (!attachedShaders || attachedShaders.length === 0) {
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+  }
+
   gl.linkProgram(program);
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     throw new Error("Failed to link program");
@@ -94,12 +101,15 @@ function updateTexture(image: TexImageSource, imageMap: TexImageSource) {
     throw new Error("Program has not been initialized");
   }
 
+  originalTexture = originalTexture || createTexture(gl);
+  depthMapTexture = depthMapTexture || createTexture(gl);
+
   gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, image);
+  gl.bindTexture(gl.TEXTURE_2D, originalTexture);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 
   gl.activeTexture(gl.TEXTURE1);
-  gl.bindTexture(gl.TEXTURE_2D, imageMap);
+  gl.bindTexture(gl.TEXTURE_2D, depthMapTexture);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageMap);
 }
 
@@ -140,6 +150,10 @@ function updateEnlarge(enlarge: number) {
 }
 
 function updateResolution(width: number, height: number) {
+  if (!canvas) {
+    throw new Error("Canvas has not been initialized");
+  }
+
   if (!gl) {
     throw new Error("WebGL2 has not been initialized");
   }
@@ -148,19 +162,40 @@ function updateResolution(width: number, height: number) {
     throw new Error("Resolution uniform location has not been initialized");
   }
 
+  canvas.width = width;
+  canvas.height = height;
   gl.uniform2f(resolutionUniformLocation, width, height);
   gl.viewport(0, 0, width, height);
 }
 
-function render() {
-  if (!gl) {
-    throw new Error("WebGL2 has not been initialized");
-  }
-
-  gl.clearColor(0, 0, 0, 0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-
-  gl.drawArrays(gl.TRIANGLES, 0, 6);
+function couldRender() {
+  return !!gl && !!originalTexture && !!depthMapTexture && !!program && !!canvas;
 }
 
-export { initRenderStore, updateTexture, render, updateOffset, updateFocus, updateEnlarge, updateResolution };
+function render(targetCanvas: HTMLCanvasElement) {
+  if (!couldRender()) {
+    return;
+  }
+
+  gl!.clearColor(0, 0, 0, 0);
+  gl!.clear(gl!.COLOR_BUFFER_BIT);
+
+  gl!.drawArrays(gl!.TRIANGLES, 0, 6);
+
+  const context = targetCanvas.getContext("2d");
+  if (!context) {
+    throw new Error("Canvas context not supported");
+  }
+  context.drawImage(canvas!, 0, 0, canvas!.width, canvas!.height);
+}
+
+export {
+  initRenderStore,
+  updateTexture,
+  render,
+  couldRender,
+  updateOffset,
+  updateFocus,
+  updateEnlarge,
+  updateResolution,
+};
