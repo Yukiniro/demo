@@ -13,9 +13,11 @@ precision highp float;
 in vec2 v_texCoord;
 
 uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-uniform sampler2D image0;
-uniform sampler2D image1;
+uniform vec3 u_offset;
+uniform float u_focus;
+uniform float u_enlarge;
+uniform sampler2D u_image;
+uniform sampler2D u_imageMap;
 
 out vec4 outColor;
 
@@ -38,7 +40,7 @@ vec3 perspective(
 
   for (int i = 0; i < step_count; i++) {
     ray_origin += ray_direction;
-    float scene_z = 1.0 - texture(image1, ray_origin.xy + 0.5).x;
+    float scene_z = 1.0 - texture(u_imageMap, ray_origin.xy + 0.5).x;
     if (ray_origin.z > scene_z) {
       if (ray_origin.z - scene_z < hit_threshold) {
         break;
@@ -48,19 +50,12 @@ vec3 perspective(
     }
   }
 
-  return texture(image0, ray_origin.xy + 0.5).rgb;
+  return texture(u_image, ray_origin.xy + 0.5).rgb;
 }
 
 void main(void) {
-
-  float focus = 0.5;
-  float scaleX = 50.0;
-  float scaleY = 30.0;
-  float x_offset = u_mouse.x / u_resolution.x * scaleX;
-  float y_offset = u_mouse.y / u_resolution.y * scaleY;
-
+  float aspect = u_resolution.x / u_resolution.y;
   vec2 uv = gl_FragCoord.xy / u_resolution.xy;
   uv.y = 1. - uv.y;
-
-  outColor = vec4(perspective(uv, vec3(x_offset, y_offset, 0.0), focus), 1.0);
+  outColor = vec4(perspective(uv, vec3(u_offset.x, u_offset.y * aspect, u_offset.z), u_focus), 1.0);
 }`;
