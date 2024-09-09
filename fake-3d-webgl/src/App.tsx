@@ -1,52 +1,34 @@
-import { useEffect, useRef, useState } from "react";
-import SelectImage, { IMAGE_INFO } from "./components/SelectImage";
+import { useEffect, useRef } from "react";
 import { useTextureStore } from "./store/use-texture-store";
 import Layout from "./components/layout";
 import Error from "./components/error";
-import { render } from "./store/render-store";
+import { Divider } from "@douyinfe/semi-ui";
+import { bindCanvas } from "./store/app-store";
+import Tools from "./components/tools";
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const viewSize = useTextureStore(state => state.viewSize);
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
   const pending = useTextureStore(state => state.pending);
   const error = useTextureStore(state => state.error);
-  const { init, setImages } = useTextureStore(state => ({ init: state.init, setImages: state.setImages }));
-
-  const [originalImageUrl, setOriginalImageUrl] = useState(IMAGE_INFO[4].originalImageUrl);
-  const [depthImageUrl, setDepthImageUrl] = useState(IMAGE_INFO[4].depthImageUrl);
-
-  const handleChange = (originalImageUrl: string, depthImageUrl: string): void => {
-    setOriginalImageUrl(originalImageUrl);
-    setDepthImageUrl(depthImageUrl);
-  };
+  const { init, updateViewSize } = useTextureStore(state => ({
+    init: state.init,
+    updateViewSize: state.updateViewSize,
+  }));
 
   useEffect(() => init(), [init]);
+  useEffect(() => {
+    const box = canvasBoxRef.current;
+    if (!box) {
+      return;
+    }
+    const { width, height } = box.getBoundingClientRect();
+    updateViewSize(width, height);
+  }, [updateViewSize]);
 
   useEffect(() => {
-    if (!originalImageUrl || !depthImageUrl) {
-      return;
-    }
-
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
-
-    setImages(originalImageUrl, depthImageUrl);
-    render(canvas);
-  }, [depthImageUrl, originalImageUrl, setImages]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
-
-    canvas.width = viewSize.width;
-    canvas.height = viewSize.height;
-
-    render(canvas);
-  }, [viewSize]);
+    canvasRef.current && bindCanvas(canvasRef.current);
+  });
 
   if (pending) {
     return <Layout>Loading...</Layout>;
@@ -58,15 +40,15 @@ function App() {
 
   return (
     <Layout>
-      <div className="flex gap-8">
-        <div className="relative">
+      <div className="relative w-full h-[calc(100%-131px)]">
+        <div
+          ref={canvasBoxRef}
+          className="flex items-center justify-center w-[calc(100%-400px)] h-full absolute left-0"
+        >
           <canvas ref={canvasRef} />
         </div>
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-between items-center gap-4 w-80">
-            图片： <SelectImage handleChange={handleChange} />
-          </div>
-        </div>
+        <Divider className="absolute h-full right-[400px]" layout="vertical" />
+        <Tools />
       </div>
     </Layout>
   );

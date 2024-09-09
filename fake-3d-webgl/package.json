@@ -13,6 +13,7 @@
   "dependencies": {
     "@douyinfe/semi-illustrations": "^2.65.0",
     "@douyinfe/semi-ui": "^2.65.0",
+    "classnames": "^2.5.1",
     "daisyui": "^4.12.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -31,6 +32,7 @@
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.4",
+    "less": "^4.2.0",
     "postcss": "^8.4.31",
     "prettier": "^3.1.0",
     "typescript": "^5.5.4",

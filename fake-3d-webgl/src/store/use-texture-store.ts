@@ -1,14 +1,7 @@
 import { create } from "zustand";
-import { loadImage } from "../utils";
-import {
-  couldRender,
-  initRenderStore,
-  render,
-  updateFocus,
-  updateOffset,
-  updateResolution,
-  updateTexture,
-} from "./render-store";
+import { fitSize, loadImage } from "../utils";
+import { initRenderStore, updateFocus, updateOffset, updateResolution, updateTexture } from "./render-store";
+import { IMAGE_INFO } from "../components/select-image";
 
 type State = {
   originalImageUrl: string;
@@ -16,27 +9,37 @@ type State = {
   pending: boolean;
   error: Error | null;
   viewSize: { width: number; height: number };
+  canvasSize: { width: number; height: number };
+  imageSize: { width: number; height: number };
 };
 
 type Action = {
   setImages: (originalImageUrl: string, depthMapImageUrl: string) => void;
   init: () => void;
-  render: (canvas: HTMLCanvasElement) => void;
+  updateViewSize: (width: number, height: number) => void;
 };
 
-const BASE_CANVAS_HEIGHT = 650;
-
 export const useTextureStore = create<State & Action>((set, get) => ({
-  originalImageUrl: "",
-  depthMapImageUrl: "",
+  originalImageUrl: IMAGE_INFO[4].originalImageUrl,
+  depthMapImageUrl: IMAGE_INFO[4].depthImageUrl,
   pending: false,
   error: null,
   viewSize: { width: 0, height: 0 },
+  canvasSize: { width: 0, height: 0 },
+  imageSize: { width: 0, height: 0 },
   init: () => {
     initRenderStore();
   },
+  updateViewSize: (width: number, height: number) => {
+    set({ viewSize: { width, height } });
+  },
   setImages: async (originalImageUrl: string, depthMapImageUrl: string) => {
-    const { pending, originalImageUrl: currentOriginalImageUrl, depthMapImageUrl: currentDepthMapImageUrl } = get();
+    const {
+      pending,
+      originalImageUrl: currentOriginalImageUrl,
+      depthMapImageUrl: currentDepthMapImageUrl,
+      viewSize,
+    } = get();
     if (pending) return;
     if (currentOriginalImageUrl === originalImageUrl && currentDepthMapImageUrl === depthMapImageUrl) return;
 
@@ -45,10 +48,11 @@ export const useTextureStore = create<State & Action>((set, get) => ({
       const originalImage = await loadImage(originalImageUrl);
       const depthMapImage = await loadImage(depthMapImageUrl);
 
-      const height = BASE_CANVAS_HEIGHT;
-      const width = (originalImage.width / originalImage.height) * BASE_CANVAS_HEIGHT;
-      set({ viewSize: { width, height } });
-      updateResolution(width, height);
+      const imageSize = { width: originalImage.width, height: originalImage.height };
+      const canvasSize = fitSize(imageSize, viewSize);
+      set({ imageSize, canvasSize });
+
+      updateResolution(canvasSize.width, canvasSize.height);
       updateTexture(originalImage, depthMapImage);
 
       // TODO 更新
@@ -61,8 +65,5 @@ export const useTextureStore = create<State & Action>((set, get) => ({
     } finally {
       set({ pending: false });
     }
-  },
-  render: (canvas: HTMLCanvasElement) => {
-    if (couldRender()) render(canvas);
   },
 }));

@@ -40,3 +40,24 @@ export async function loadImage(url: string): Promise<HTMLImageElement> {
     image.onerror = () => reject(new Error(`Failed to load image: ${url}`));
   });
 }
+
+type Size = {
+  width: number;
+  height: number;
+};
+export function fitSize(inSize: Size, outSize: Size) {
+  const inRatio = inSize.width / inSize.height;
+  const outRatio = outSize.width / outSize.height;
+
+  if (inRatio > outRatio) {
+    return {
+      width: outSize.width,
+      height: outSize.width / inRatio,
+    };
+  } else {
+    return {
+      width: outSize.height * inRatio,
+      height: outSize.height,
+    };
+  }
+}
