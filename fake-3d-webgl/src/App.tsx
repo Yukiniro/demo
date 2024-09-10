@@ -34,10 +34,6 @@ function App() {
     triggerAnimationRender();
   }, [triggerAnimationRender]);
 
-  if (pending) {
-    return <Layout>Loading...</Layout>;
-  }
-
   if (error) {
     return <Error errorMessage={error.message} />;
   }
@@ -53,6 +49,11 @@ function App() {
         </div>
         <Divider className="absolute h-full right-[400px]" layout="vertical" />
         <Tools />
+        {pending && (
+          <div className="fixed top-0 left-0 w-full h-full bg-black opacity-75 flex justify-center items-center">
+            Loading...
+          </div>
+        )}
       </div>
     </Layout>
   );

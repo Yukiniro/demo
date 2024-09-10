@@ -13,7 +13,6 @@
   "dependencies": {
     "@douyinfe/semi-illustrations": "^2.65.0",
     "@douyinfe/semi-ui": "^2.65.0",
-    "animejs": "^3.2.2",
     "classnames": "^2.5.1",
     "daisyui": "^4.12.10",
     "react": "^18.2.0",
@@ -23,7 +22,6 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
-    "@types/animejs": "^3.1.12",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@typescript-eslint/eslint-plugin": "^6.10.0",

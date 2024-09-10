@@ -32,10 +32,17 @@ function Tools() {
 
   const commonSettings = useMemo(() => {
     return [
-      { label: "Amount of Motion", min: 0, max: 100, value: amount, onChange: updateAmount },
-      { label: "Animation Length", min: 0, max: 10, value: animationDuration, onChange: updateAnimationDuration },
-      { label: "Focus Point", min: 0, max: 1, step: 0.1, value: focus, onChange: updateFocus },
-      { label: "Edge Dilation", min: 0, max: 10, value: edgeDilation, onChange: updateEdgeDilation },
+      { label: "Amount of Motion", min: 0, max: 1, step: 0.01, value: amount, onChange: updateAmount },
+      {
+        label: "Animation Length",
+        min: 0,
+        max: 10,
+        step: 0.1,
+        value: animationDuration,
+        onChange: updateAnimationDuration,
+      },
+      { label: "Focus Point", min: 0, max: 1, step: 0.01, value: focus, onChange: updateFocus },
+      { label: "Edge Dilation", min: 0, max: 1, step: 0.01, value: edgeDilation, onChange: updateEdgeDilation },
     ];
   }, [
     amount,

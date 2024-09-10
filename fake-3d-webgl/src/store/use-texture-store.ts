@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { fitSize, loadImage } from "../utils";
 import { initRenderStore, updateFocus, updateOffset, updateResolution, updateTexture } from "./render-store";
-import { IMAGE_INFO } from "../components/select-image";
+import { useToolsStore } from "./use-tools-store";
 
 type State = {
   originalImageUrl: string;
@@ -20,8 +20,8 @@ type Action = {
 };
 
 export const useTextureStore = create<State & Action>((set, get) => ({
-  originalImageUrl: IMAGE_INFO[4].originalImageUrl,
-  depthMapImageUrl: IMAGE_INFO[4].depthImageUrl,
+  originalImageUrl: "",
+  depthMapImageUrl: "",
   pending: false,
   error: null,
   viewSize: { width: 0, height: 0 },
@@ -32,6 +32,7 @@ export const useTextureStore = create<State & Action>((set, get) => ({
   },
   updateViewSize: (width: number, height: number) => {
     set({ viewSize: { width, height } });
+    useToolsStore.getState().triggerAnimationRender();
   },
   setImages: async (originalImageUrl: string, depthMapImageUrl: string) => {
     const {
@@ -42,6 +43,7 @@ export const useTextureStore = create<State & Action>((set, get) => ({
     } = get();
     if (pending) return;
     if (currentOriginalImageUrl === originalImageUrl && currentDepthMapImageUrl === depthMapImageUrl) return;
+    if (viewSize.width === 0 || viewSize.height === 0) return;
 
     try {
       set({ pending: true, error: null });
@@ -60,6 +62,8 @@ export const useTextureStore = create<State & Action>((set, get) => ({
       updateFocus(0.5);
 
       set({ originalImageUrl, depthMapImageUrl });
+
+      useToolsStore.getState().triggerAnimationRender();
     } catch (error) {
       set({ error: error as Error });
     } finally {
