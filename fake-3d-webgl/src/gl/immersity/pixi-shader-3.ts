@@ -2,7 +2,7 @@
  * 参考 https://app.immersity.ai/ 的 shader
  */
 
-export const vertexShaderSource3 = `
+export const vertexShaderSource = `
 precision highp float;
 #define SHADER_NAME pixi-shader-3
 attribute vec2 aVertexPosition;
@@ -43,7 +43,7 @@ void main(void ) {
 }
 `;
 
-export const fragmentShaderSource3 = `
+export const fragmentShaderSource = `
 precision mediump float;
 #define SHADER_NAME pixi-shader-3
 precision highp float;
