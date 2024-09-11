@@ -3,7 +3,6 @@ import { MotionType } from "./use-tools-store";
 
 let canvas: HTMLCanvasElement | null = null;
 let timer: number | null = null;
-let startTime: number = 0;
 
 function bindCanvas(renderCanvas: HTMLCanvasElement) {
   if (renderCanvas === canvas) {
@@ -26,6 +25,8 @@ function updateAnimationRender(
     focus: number;
     edgeDilation: number;
     motionType: MotionType;
+    isLoop: boolean;
+    isReverse: boolean;
   },
 ) {
   if (!canvasSize || !canvas) {
@@ -43,6 +44,8 @@ function updateAnimationRender(
     amplitudePoint,
     phasePoint,
     motionType,
+    isLoop,
+    isReverse,
   } = options;
 
   updateEnlarge(enlarge);
@@ -52,17 +55,11 @@ function updateAnimationRender(
   if (timer) {
     cancelAnimationFrame(timer);
     timer = null;
-    startTime = 0;
   }
 
-  const isLoop = true;
-  const isReverse = false;
   const isCircular = motionType === "CIRCULAR";
 
   const tick = () => {
-    if (startTime === 0) {
-      startTime = performance.now();
-    }
     const progress = calcProgress(performance.now() / 1e3 / animationDuration, isCircular, isLoop, isReverse);
     const offset = { x: 0, y: 0, z: 0 };
     if (motionType === "CIRCULAR") {

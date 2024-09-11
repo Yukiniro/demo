@@ -5,23 +5,32 @@ import ManualSettingsControl from "./manual-settingsControl-control";
 import Presets from "./presets";
 import SelectImage, { IMAGE_INFO } from "./select-image";
 import { Divider, Slider } from "@douyinfe/semi-ui";
+import LabelSwitch from "./label-switch";
 
 function Tools() {
   const { setImages } = useTextureStore(state => ({
     setImages: state.setImages,
   }));
-  const { amount, animationDuration, focus, edgeDilation } = useToolsStore(state => ({
-    amount: state.amount,
-    animationDuration: state.animationDuration,
-    focus: state.focus,
-    edgeDilation: state.edgeDilation,
-  }));
-  const { updateAmount, updateAnimationDuration, updateFocus, updateEdgeDilation } = useToolsStore(state => ({
-    updateAmount: state.updateAmount,
-    updateAnimationDuration: state.updateAnimationDuration,
-    updateFocus: state.updateFocus,
-    updateEdgeDilation: state.updateEdgeDilation,
-  }));
+  const { amount, animationDuration, focus, edgeDilation, isLoop, isReverse, isLoopDisabled, isReverseDisabled } =
+    useToolsStore(state => ({
+      amount: state.amount,
+      animationDuration: state.animationDuration,
+      focus: state.focus,
+      edgeDilation: state.edgeDilation,
+      isLoop: state.isLoop,
+      isReverse: state.isReverse,
+      isLoopDisabled: state.isLoopDisabled,
+      isReverseDisabled: state.isReverseDisabled,
+    }));
+  const { updateAmount, updateAnimationDuration, updateFocus, updateEdgeDilation, updateIsLoop, updateIsReverse } =
+    useToolsStore(state => ({
+      updateAmount: state.updateAmount,
+      updateAnimationDuration: state.updateAnimationDuration,
+      updateFocus: state.updateFocus,
+      updateEdgeDilation: state.updateEdgeDilation,
+      updateIsLoop: state.updateIsLoop,
+      updateIsReverse: state.updateIsReverse,
+    }));
 
   const handleChange = useCallback(
     (originalImageUrl: string, depthImageUrl: string): void => {
@@ -64,6 +73,8 @@ function Tools() {
       <div className="flex justify-between items-center gap-4 px-4 py-2">
         选择图片： <SelectImage handleChange={handleChange} />
       </div>
+      <LabelSwitch label="Loop" checked={isLoop} disabled={isLoopDisabled} onChange={updateIsLoop} />
+      <LabelSwitch label="Reverse" checked={isReverse} disabled={isReverseDisabled} onChange={updateIsReverse} />
       <Presets />
       <Divider />
       <ManualSettingsControl />

@@ -4,6 +4,17 @@ import { updateAnimationRender } from "./app-store";
 import { useTextureStore } from "./use-texture-store";
 
 export type MotionType = "CIRCULAR" | "LINEAR" | "THREEPOINTLINEAR";
+export type PresetType =
+  | "Vertical"
+  | "Horizontal"
+  | "Circle"
+  | "Perspective"
+  | "Zoom"
+  | "Dolly"
+  | "Zoom Left"
+  | "Zoom Center"
+  | "Zoom Right"
+  | "Custom";
 
 type State = {
   startPoint: Point;
@@ -15,7 +26,12 @@ type State = {
   animationDuration: number;
   focus: number;
   edgeDilation: number;
+  isLoop: boolean;
+  isReverse: boolean;
   motionType: MotionType;
+  presetType: PresetType;
+  isLoopDisabled: boolean;
+  isReverseDisabled: boolean;
 };
 
 type Action = {
@@ -30,10 +46,138 @@ type Action = {
   updateEdgeDilation: (amount: number) => void;
   updateMotionType: (motionType: MotionType) => void;
   triggerAnimationRender: () => void;
+  updatePresetType: (presetType: PresetType) => void;
+  updateIsLoop: (isLoop: boolean) => void;
+  updateIsReverse: (isReverse: boolean) => void;
+};
+
+const presetTypeMap = {
+  Vertical: {
+    motionType: "LINEAR",
+    startPoint: { x: 0, y: 0.1, z: 0 },
+    endPoint: { x: 0, y: -0.1, z: 0 },
+    amount: 0.4,
+    animationDuration: 4,
+    focus: 0.5,
+    edgeDilation: 0,
+    isLoop: true,
+    isReverse: false,
+    isLoopDisabled: false,
+    isReverseDisabled: false,
+  },
+  Horizontal: {
+    motionType: "LINEAR",
+    startPoint: { x: 0.1, y: 0, z: 0 },
+    endPoint: { x: -0.1, y: 0, z: 0 },
+    amount: 0.4,
+    animationDuration: 4,
+    focus: 0.5,
+    edgeDilation: 0,
+    isLoop: true,
+    isReverse: false,
+    isLoopDisabled: false,
+    isReverseDisabled: false,
+  },
+  Circle: {
+    motionType: "CIRCULAR",
+    amplitudePoint: { x: 0.1, y: 0.1, z: 0 },
+    phasePoint: { x: 0, y: 1, z: 1 },
+    amount: 0.4,
+    animationDuration: 8,
+    focus: 0.5,
+    edgeDilation: 0,
+    isLoop: true,
+    isReverse: false,
+    isLoopDisabled: true,
+    isReverseDisabled: false,
+  },
+  Perspective: {
+    motionType: "CIRCULAR",
+    amplitudePoint: { x: 0.1, y: 0.05, z: 0.4 },
+    phasePoint: { x: 0, y: 1, z: 1 },
+    amount: 0.4,
+    animationDuration: 8,
+    focus: 0.5,
+    edgeDilation: 0,
+    isLoop: true,
+    isReverse: false,
+    isLoopDisabled: true,
+    isReverseDisabled: false,
+  },
+  Zoom: {
+    motionType: "LINEAR",
+    startPoint: { x: 0, y: 0, z: -0.2 },
+    endPoint: { x: 0, y: 0, z: 0.8 },
+    amount: 0.4,
+    animationDuration: 8,
+    focus: 1,
+    edgeDilation: 0,
+    isLoop: true,
+    isReverse: false,
+    isLoopDisabled: false,
+    isReverseDisabled: false,
+  },
+  Dolly: {
+    motionType: "LINEAR",
+    startPoint: { x: 0, y: 0, z: 0.2 },
+    endPoint: { x: 0, y: 0, z: -0.8 },
+    amount: 0.65,
+    animationDuration: 10,
+    focus: 0.5,
+    edgeDilation: 0,
+    isLoop: false,
+    isReverse: false,
+    isLoopDisabled: false,
+    isReverseDisabled: false,
+  },
+  "Zoom Left": {
+    motionType: "THREEPOINTLINEAR",
+    startPoint: { x: -0.3, y: -0.1, z: -0.2 },
+    middlePoint: { x: 0, y: 0.1, z: 0.1 },
+    endPoint: { x: 0.2, y: 0, z: 0.6 },
+    amount: 0.4,
+    animationDuration: 10,
+    focus: 1,
+    edgeDilation: 0,
+    isLoop: false,
+    isReverse: false,
+    isLoopDisabled: false,
+    isReverseDisabled: false,
+  },
+  "Zoom Center": {
+    motionType: "THREEPOINTLINEAR",
+    startPoint: { x: 0, y: -0.1, z: -0.2 },
+    middlePoint: { x: 0, y: 0.1, z: 0.2 },
+    endPoint: { x: 0, y: 0, z: 0.6 },
+    amount: 0.4,
+    animationDuration: 10,
+    focus: 1,
+    edgeDilation: 0,
+    isLoop: false,
+    isReverse: false,
+    isLoopDisabled: false,
+    isReverseDisabled: false,
+  },
+  "Zoom Right": {
+    motionType: "THREEPOINTLINEAR",
+    startPoint: { x: 0.3, y: -0.1, z: -0.2 },
+    middlePoint: { x: 0, y: 0.1, z: 0.1 },
+    endPoint: { x: -0.2, y: 0, z: 0.6 },
+    amount: 0.4,
+    animationDuration: 10,
+    focus: 1,
+    edgeDilation: 0,
+    isLoop: false,
+    isReverse: false,
+    isLoopDisabled: false,
+    isReverseDisabled: false,
+  },
+  Custom: null,
 };
 
 export const useToolsStore = create<State & Action>((set, get) => ({
   motionType: "LINEAR",
+  presetType: "Custom",
   startPoint: { x: 0.05, y: 0, z: 0 },
   endPoint: { x: -0.05, y: 0, z: 0 },
   middlePoint: { x: 0, y: 0, z: 0 },
@@ -43,49 +187,70 @@ export const useToolsStore = create<State & Action>((set, get) => ({
   animationDuration: 4,
   focus: 0.5, // 0-1 对应 u_focus 0.0 - 1.0
   edgeDilation: 0, // 0-1 对应 u_dilation 0.0 - 0.005
+  isLoopDisabled: false,
+  isReverseDisabled: false,
+  isLoop: true,
+  isReverse: false,
+  updateIsLoop: (isLoop: boolean) => {
+    set({ isLoop, presetType: "Custom" });
+    get().triggerAnimationRender();
+  },
+  updateIsReverse: (isReverse: boolean) => {
+    set({ isReverse, presetType: "Custom" });
+    get().triggerAnimationRender();
+  },
+  updatePresetType: (presetType: PresetType) => {
+    set({ presetType });
+    if (presetType !== "Custom") {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      set(presetTypeMap[presetType]);
+    }
+    get().triggerAnimationRender();
+  },
   updateStartPoint: (x: number, y: number, z: number) => {
     const startPoint = { x, y, z };
-    set({ startPoint });
+    set({ startPoint, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   updateEndPoint: (x: number, y: number, z: number) => {
     const endPoint = { x, y, z };
-    set({ endPoint });
+    set({ endPoint, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   updateMiddlePoint: (x: number, y: number, z: number) => {
     const middlePoint = { x, y, z };
-    set({ middlePoint });
+    set({ middlePoint, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   updateAmplitudePoint: (x: number, y: number, z: number) => {
     const amplitudePoint = { x, y, z };
-    set({ amplitudePoint });
+    set({ amplitudePoint, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   updatePhasePoint: (x: number, y: number, z: number) => {
     const phasePoint = { x, y, z };
-    set({ phasePoint });
+    set({ phasePoint, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   updateAmount: (amount: number) => {
-    set({ amount });
+    set({ amount, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   updateAnimationDuration: (duration: number) => {
-    set({ animationDuration: duration });
+    set({ animationDuration: duration, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   updateFocus: (focus: number) => {
-    set({ focus });
+    set({ focus, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   updateEdgeDilation: (edgeDilation: number) => {
-    set({ edgeDilation });
+    set({ edgeDilation, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   updateMotionType: (motionType: MotionType) => {
-    set({ motionType });
+    set({ motionType, presetType: "Custom" });
     get().triggerAnimationRender();
   },
   triggerAnimationRender: () => {
@@ -100,6 +265,8 @@ export const useToolsStore = create<State & Action>((set, get) => ({
       motionType,
       amplitudePoint,
       phasePoint,
+      isLoop,
+      isReverse,
     } = get();
     const { canvasSize } = useTextureStore.getState();
     updateAnimationRender(canvasSize, {
@@ -113,11 +280,13 @@ export const useToolsStore = create<State & Action>((set, get) => ({
         z: 0.25 * phasePoint.z,
       },
       amountOfMotion: amount,
-      animationDuration: motionType === "CIRCULAR" ? animationDuration : animationDuration / 2,
+      animationDuration: motionType === "LINEAR" ? animationDuration / 2 : animationDuration,
       enlarge: 1 + calculateCropValue(),
       focus,
       edgeDilation: edgeDilation * 0.005,
       motionType,
+      isLoop,
+      isReverse,
     });
   },
 }));
