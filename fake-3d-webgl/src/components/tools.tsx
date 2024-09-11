@@ -73,6 +73,7 @@ function Tools() {
       <div className="flex justify-between items-center gap-4 px-4 py-2">
         选择图片： <SelectImage handleChange={handleChange} />
       </div>
+      <Divider />
       <LabelSwitch label="Loop" checked={isLoop} disabled={isLoopDisabled} onChange={updateIsLoop} />
       <LabelSwitch label="Reverse" checked={isReverse} disabled={isReverseDisabled} onChange={updateIsReverse} />
       <Presets />

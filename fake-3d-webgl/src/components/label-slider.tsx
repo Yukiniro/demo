@@ -11,7 +11,7 @@ interface LabelSliderProps {
 
 function LabelSlider({ label, value, onChange, min = -1, max = 1, step = 0.01 }: LabelSliderProps) {
   return (
-    <div className="py-2">
+    <div className="py-4">
       <div>{label}</div>
       {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
       {/* @ts-expect-error */}
