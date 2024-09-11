@@ -6,12 +6,15 @@ import Error from "./components/error";
 import { Divider } from "@douyinfe/semi-ui";
 import { bindCanvas } from "./store/app-store";
 import Tools from "./components/tools";
+import { useExportStore } from "./store/use-export-store";
+import ExportView from "./components/export-view";
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const pending = useTextureStore(state => state.pending);
   const error = useTextureStore(state => state.error);
+  const isExporting = useExportStore(state => state.isExporting);
   const { init, updateViewSize } = useTextureStore(state => ({
     init: state.init,
     updateViewSize: state.updateViewSize,
@@ -55,6 +58,7 @@ function App() {
           </div>
         )}
       </div>
+      {isExporting && <ExportView />}
     </Layout>
   );
 }
