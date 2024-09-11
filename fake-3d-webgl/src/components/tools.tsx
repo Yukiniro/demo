@@ -66,7 +66,7 @@ function Tools() {
   ]);
 
   useEffect(() => {
-    handleChange(IMAGE_INFO[4].originalImageUrl, IMAGE_INFO[4].depthImageUrl);
+    handleChange(IMAGE_INFO[0].originalImageUrl, IMAGE_INFO[0].depthImageUrl);
   }, [handleChange]);
 
   return (
