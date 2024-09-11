@@ -1,4 +1,5 @@
 import { Point, updateOffset, render, updateFocus, updateEnlarge, updateDilation } from "./render-store";
+import { MotionType } from "./use-tools-store";
 
 let canvas: HTMLCanvasElement | null = null;
 let timer: number | null = null;
@@ -15,17 +16,34 @@ function updateAnimationRender(
   canvasSize: { width: number; height: number },
   options: {
     startPoint: Point;
+    middlePoint: Point;
     endPoint: Point;
     animationDuration: number;
+    amountOfMotion: number;
+    amplitudePoint: Point;
+    phasePoint: Point;
     enlarge: number;
     focus: number;
     edgeDilation: number;
+    motionType: MotionType;
   },
 ) {
   if (!canvasSize || !canvas) {
     return;
   }
-  const { startPoint, endPoint, animationDuration, enlarge, focus, edgeDilation } = options;
+  const {
+    startPoint,
+    middlePoint,
+    endPoint,
+    animationDuration,
+    amountOfMotion,
+    enlarge,
+    focus,
+    edgeDilation,
+    amplitudePoint,
+    phasePoint,
+    motionType,
+  } = options;
 
   updateEnlarge(enlarge);
   updateFocus(focus);
@@ -39,21 +57,39 @@ function updateAnimationRender(
 
   const isLoop = true;
   const isReverse = false;
-  const isCircular = false;
+  const isCircular = motionType === "CIRCULAR";
 
   const tick = () => {
     if (startTime === 0) {
       startTime = performance.now();
     }
     const progress = calcProgress(performance.now() / 1e3 / animationDuration, isCircular, isLoop, isReverse);
-    const offset = calcProgressOffset(
-      [startPoint.x, startPoint.y, startPoint.z],
-      null,
-      [endPoint.x, endPoint.y, endPoint.z],
-      1,
-      progress,
-    );
-    updateOffset({ x: offset[0], y: offset[1], z: offset[2] });
+    const offset = { x: 0, y: 0, z: 0 };
+    if (motionType === "CIRCULAR") {
+      const [x, y, z] = calcCircularProgressOffset(
+        [amplitudePoint.x, amplitudePoint.y, amplitudePoint.z],
+        [phasePoint.x, phasePoint.y, phasePoint.z],
+        amountOfMotion,
+        progress,
+      );
+      offset.x = x;
+      offset.y = y;
+      offset.z = z;
+    } else {
+      const middlePointArr = motionType === "LINEAR" ? null : [middlePoint.x, middlePoint.y, middlePoint.z];
+      const [x, y, z] = calcProgressOffset(
+        [startPoint.x, startPoint.y, startPoint.z],
+        middlePointArr,
+        [endPoint.x, endPoint.y, endPoint.z],
+        amountOfMotion,
+        progress,
+      );
+      offset.x = x;
+      offset.y = y;
+      offset.z = z;
+    }
+
+    updateOffset(offset);
 
     if (canvas) {
       canvas.width = canvasSize.width;
@@ -83,6 +119,14 @@ function calcProgressValue(startValue: number, middleValue: number, endValue: nu
   const coefficientO =
     (0.5 * 1 * (0.5 - 1) * startValue + 1 * 0 * 1 * middleValue + 0 * 0.5 * (0 - 0.5) * endValue) / -0.25;
   return coefficientY * progress * progress + coefficientC * progress + coefficientO;
+}
+
+function calcCircularProgressOffset(amplitudePoint: number[], phasePoint: number[], amount: number, progress: number) {
+  return [
+    Math.sin(2 * Math.PI * (progress + phasePoint[0])) * amplitudePoint[0] * amount,
+    Math.sin(2 * Math.PI * (progress + phasePoint[1])) * amplitudePoint[1] * amount,
+    0.5 * (1 + Math.sin(2 * Math.PI * (progress + phasePoint[2]))) * amplitudePoint[2] * amount,
+  ];
 }
 
 function calcProgressOffset(

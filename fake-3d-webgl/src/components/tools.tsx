@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useTextureStore } from "../store/use-texture-store";
 import { useToolsStore } from "../store/use-tools-store";
-import LinearControl from "./linear-control";
+import ManualSettingsControl from "./manual-settingsControl-control";
 import Presets from "./presets";
 import SelectImage, { IMAGE_INFO } from "./select-image";
-import { Slider } from "@douyinfe/semi-ui";
+import { Divider, Slider } from "@douyinfe/semi-ui";
 
 function Tools() {
   const { setImages } = useTextureStore(state => ({
@@ -65,7 +65,8 @@ function Tools() {
         选择图片： <SelectImage handleChange={handleChange} />
       </div>
       <Presets />
-      <LinearControl />
+      <Divider />
+      <ManualSettingsControl />
       {commonSettings.map(({ label, min, max, step, value, onChange }) => (
         <div className="py-4 px-4 border-t" key={label}>
           <div>{label}</div>
