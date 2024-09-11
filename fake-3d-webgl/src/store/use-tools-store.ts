@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { Point } from "./render-store";
 import { updateAnimationRender } from "./app-store";
 import { useTextureStore } from "./use-texture-store";
+import { PRESET_TYPE_MAP } from "../config";
 
 export type MotionType = "CIRCULAR" | "LINEAR" | "THREEPOINTLINEAR";
 export type PresetType =
@@ -51,130 +52,6 @@ type Action = {
   updateIsReverse: (isReverse: boolean) => void;
 };
 
-const presetTypeMap = {
-  Vertical: {
-    motionType: "LINEAR",
-    startPoint: { x: 0, y: 0.1, z: 0 },
-    endPoint: { x: 0, y: -0.1, z: 0 },
-    amount: 0.4,
-    animationDuration: 4,
-    focus: 0.5,
-    edgeDilation: 0,
-    isLoop: true,
-    isReverse: false,
-    isLoopDisabled: false,
-    isReverseDisabled: false,
-  },
-  Horizontal: {
-    motionType: "LINEAR",
-    startPoint: { x: 0.1, y: 0, z: 0 },
-    endPoint: { x: -0.1, y: 0, z: 0 },
-    amount: 0.4,
-    animationDuration: 4,
-    focus: 0.5,
-    edgeDilation: 0,
-    isLoop: true,
-    isReverse: false,
-    isLoopDisabled: false,
-    isReverseDisabled: false,
-  },
-  Circle: {
-    motionType: "CIRCULAR",
-    amplitudePoint: { x: 0.1, y: 0.1, z: 0 },
-    phasePoint: { x: 0, y: 1, z: 1 },
-    amount: 0.4,
-    animationDuration: 8,
-    focus: 0.5,
-    edgeDilation: 0,
-    isLoop: true,
-    isReverse: false,
-    isLoopDisabled: true,
-    isReverseDisabled: false,
-  },
-  Perspective: {
-    motionType: "CIRCULAR",
-    amplitudePoint: { x: 0.1, y: 0.05, z: 0.4 },
-    phasePoint: { x: 0, y: 1, z: 1 },
-    amount: 0.4,
-    animationDuration: 8,
-    focus: 0.5,
-    edgeDilation: 0,
-    isLoop: true,
-    isReverse: false,
-    isLoopDisabled: true,
-    isReverseDisabled: false,
-  },
-  Zoom: {
-    motionType: "LINEAR",
-    startPoint: { x: 0, y: 0, z: -0.2 },
-    endPoint: { x: 0, y: 0, z: 0.8 },
-    amount: 0.4,
-    animationDuration: 8,
-    focus: 1,
-    edgeDilation: 0,
-    isLoop: true,
-    isReverse: false,
-    isLoopDisabled: false,
-    isReverseDisabled: false,
-  },
-  Dolly: {
-    motionType: "LINEAR",
-    startPoint: { x: 0, y: 0, z: 0.2 },
-    endPoint: { x: 0, y: 0, z: -0.8 },
-    amount: 0.65,
-    animationDuration: 10,
-    focus: 0.5,
-    edgeDilation: 0,
-    isLoop: false,
-    isReverse: false,
-    isLoopDisabled: false,
-    isReverseDisabled: false,
-  },
-  "Zoom Left": {
-    motionType: "THREEPOINTLINEAR",
-    startPoint: { x: -0.3, y: -0.1, z: -0.2 },
-    middlePoint: { x: 0, y: 0.1, z: 0.1 },
-    endPoint: { x: 0.2, y: 0, z: 0.6 },
-    amount: 0.4,
-    animationDuration: 10,
-    focus: 1,
-    edgeDilation: 0,
-    isLoop: false,
-    isReverse: false,
-    isLoopDisabled: false,
-    isReverseDisabled: false,
-  },
-  "Zoom Center": {
-    motionType: "THREEPOINTLINEAR",
-    startPoint: { x: 0, y: -0.1, z: -0.2 },
-    middlePoint: { x: 0, y: 0.1, z: 0.2 },
-    endPoint: { x: 0, y: 0, z: 0.6 },
-    amount: 0.4,
-    animationDuration: 10,
-    focus: 1,
-    edgeDilation: 0,
-    isLoop: false,
-    isReverse: false,
-    isLoopDisabled: false,
-    isReverseDisabled: false,
-  },
-  "Zoom Right": {
-    motionType: "THREEPOINTLINEAR",
-    startPoint: { x: 0.3, y: -0.1, z: -0.2 },
-    middlePoint: { x: 0, y: 0.1, z: 0.1 },
-    endPoint: { x: -0.2, y: 0, z: 0.6 },
-    amount: 0.4,
-    animationDuration: 10,
-    focus: 1,
-    edgeDilation: 0,
-    isLoop: false,
-    isReverse: false,
-    isLoopDisabled: false,
-    isReverseDisabled: false,
-  },
-  Custom: null,
-};
-
 export const useToolsStore = create<State & Action>((set, get) => ({
   motionType: "LINEAR",
   presetType: "Custom",
@@ -204,7 +81,7 @@ export const useToolsStore = create<State & Action>((set, get) => ({
     if (presetType !== "Custom") {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      set(presetTypeMap[presetType]);
+      set(PRESET_TYPE_MAP[presetType]);
     }
     get().triggerAnimationRender();
   },

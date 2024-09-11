@@ -3,9 +3,10 @@ import { useTextureStore } from "../store/use-texture-store";
 import { useToolsStore } from "../store/use-tools-store";
 import ManualSettingsControl from "./manual-settingsControl-control";
 import Presets from "./presets";
-import SelectImage, { IMAGE_INFO } from "./select-image";
+import SelectImage from "./select-image";
 import { Divider, Slider } from "@douyinfe/semi-ui";
 import LabelSwitch from "./label-switch";
+import { IMAGE_INFO } from "../config";
 
 function Tools() {
   const { setImages } = useTextureStore(state => ({
