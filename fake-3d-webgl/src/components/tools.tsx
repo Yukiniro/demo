@@ -69,7 +69,11 @@ function Tools() {
   ]);
 
   useEffect(() => {
-    handleChange(IMAGE_INFO[0].originalImageUrl, IMAGE_INFO[0].depthImageUrl);
+    // production 环境，没有 setTimeout 会存在问题
+    // TODO 优化这里的特殊处理
+    setTimeout(() => {
+      handleChange(IMAGE_INFO[0].originalImageUrl, IMAGE_INFO[0].depthImageUrl);
+    }, 150);
   }, [handleChange]);
 
   return (
