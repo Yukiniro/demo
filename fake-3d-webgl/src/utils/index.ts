@@ -41,6 +41,10 @@ export async function loadImage(url: string): Promise<HTMLImageElement> {
   });
 }
 
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 type Size = {
   width: number;
   height: number;

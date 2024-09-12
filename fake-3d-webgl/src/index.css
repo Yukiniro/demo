@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "~@douyinfe/semi-ui/dist/css/semi.min.css";
+
+.semi-button-primary:not(.semi-button-light):not(.semi-button-borderless) {
+    background-color: var(--semi-color-primary);
+}
+
+.semi-button-light:not(.semi-button-borderless) {
+    background-color: var(--semi-color-fill-0);
+}
+
 html,
 body,
 #root {

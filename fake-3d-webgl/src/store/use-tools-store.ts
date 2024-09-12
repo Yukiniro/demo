@@ -16,6 +16,21 @@ export type PresetType =
   | "Zoom Center"
   | "Zoom Right"
   | "Custom";
+export type AnimationData = {
+  startPoint: Point;
+  middlePoint: Point;
+  endPoint: Point;
+  animationDuration: number;
+  amountOfMotion: number;
+  amplitudePoint: Point;
+  phasePoint: Point;
+  enlarge: number;
+  focus: number;
+  edgeDilation: number;
+  motionType: MotionType;
+  isLoop: boolean;
+  isReverse: boolean;
+};
 
 type State = {
   startPoint: Point;
@@ -50,6 +65,7 @@ type Action = {
   updatePresetType: (presetType: PresetType) => void;
   updateIsLoop: (isLoop: boolean) => void;
   updateIsReverse: (isReverse: boolean) => void;
+  getAnimationData: () => AnimationData;
 };
 
 export const useToolsStore = create<State & Action>((set, get) => ({
@@ -130,7 +146,7 @@ export const useToolsStore = create<State & Action>((set, get) => ({
     set({ motionType, presetType: "Custom" });
     get().triggerAnimationRender();
   },
-  triggerAnimationRender: () => {
+  getAnimationData: () => {
     const {
       startPoint,
       endPoint,
@@ -145,8 +161,8 @@ export const useToolsStore = create<State & Action>((set, get) => ({
       isLoop,
       isReverse,
     } = get();
-    const { canvasSize } = useTextureStore.getState();
-    updateAnimationRender(canvasSize, {
+
+    return {
       startPoint,
       middlePoint,
       endPoint,
@@ -164,7 +180,12 @@ export const useToolsStore = create<State & Action>((set, get) => ({
       motionType,
       isLoop,
       isReverse,
-    });
+    };
+  },
+  triggerAnimationRender: () => {
+    const { getAnimationData } = get();
+    const { canvasSize } = useTextureStore.getState();
+    updateAnimationRender(canvasSize, getAnimationData());
   },
 }));
 

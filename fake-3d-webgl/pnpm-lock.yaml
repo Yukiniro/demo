@@ -14,12 +14,21 @@ importers:
       '@douyinfe/semi-ui':
         specifier: ^2.65.0
         version: 2.65.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
       daisyui:
         specifier: ^4.12.10
         version: 4.12.10(postcss@8.4.31)
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
+      mp4box:
+        specifier: ^0.5.2
+        version: 0.5.2
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -544,6 +553,12 @@ packages:
 
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+
+  '@types/lodash-es@4.17.12':
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+
+  '@types/lodash@4.17.7':
+    resolution: {integrity: sha512-8wTvZawATi/lsmNu10/j2hk1KEP0IvjubqPE3cu1Xz7xfXXt5oCq3SNUz4fMIP4XGF9Ky+Ue2tBA3hcS7LSBlA==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -1601,6 +1616,9 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
+  lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+
   lodash.castarray@4.4.0:
     resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
 
@@ -1823,6 +1841,9 @@ packages:
 
   minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
+
+  mp4box@0.5.2:
+    resolution: {integrity: sha512-zRmGlvxy+YdW3Dmt+TR4xPHynbxwXtAQDTN/Fo9N3LMxaUlB2C5KmZpzYyGKy4c7k4Jf3RCR0A2pm9SZELOLXw==}
 
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
@@ -2893,6 +2914,12 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
+
+  '@types/lodash-es@4.17.12':
+    dependencies:
+      '@types/lodash': 4.17.7
+
+  '@types/lodash@4.17.7': {}
 
   '@types/mdast@4.0.4':
     dependencies:
@@ -4205,6 +4232,8 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
+  lodash-es@4.17.21: {}
+
   lodash.castarray@4.4.0: {}
 
   lodash.isplainobject@4.0.6: {}
@@ -4686,6 +4715,8 @@ snapshots:
       brace-expansion: 1.1.11
 
   minimist@1.2.8: {}
+
+  mp4box@0.5.2: {}
 
   ms@2.1.2: {}
 

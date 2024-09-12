@@ -1,5 +1,19 @@
-import { Point, updateOffset, render, updateFocus, updateEnlarge, updateDilation } from "./render-store";
-import { MotionType } from "./use-tools-store";
+import { sleep } from "../utils";
+import {
+  Point,
+  updateOffset,
+  render,
+  updateFocus,
+  updateEnlarge,
+  updateDilation,
+  updateResolution,
+} from "./render-store";
+import { AnimationData, MotionType } from "./use-tools-store";
+import { clamp } from "lodash-es";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+import MP4Box from "mp4box";
 
 let canvas: HTMLCanvasElement | null = null;
 let timer: number | null = null;
@@ -11,24 +25,7 @@ function bindCanvas(renderCanvas: HTMLCanvasElement) {
   canvas = renderCanvas;
 }
 
-function updateAnimationRender(
-  canvasSize: { width: number; height: number },
-  options: {
-    startPoint: Point;
-    middlePoint: Point;
-    endPoint: Point;
-    animationDuration: number;
-    amountOfMotion: number;
-    amplitudePoint: Point;
-    phasePoint: Point;
-    enlarge: number;
-    focus: number;
-    edgeDilation: number;
-    motionType: MotionType;
-    isLoop: boolean;
-    isReverse: boolean;
-  },
-) {
+function updateAnimationRender(canvasSize: { width: number; height: number }, options: AnimationData) {
   if (!canvasSize || !canvas) {
     return;
   }
@@ -59,44 +56,95 @@ function updateAnimationRender(
 
   const isCircular = motionType === "CIRCULAR";
 
-  const tick = () => {
-    const progress = calcProgress(performance.now() / 1e3 / animationDuration, isCircular, isLoop, isReverse);
-    const offset = { x: 0, y: 0, z: 0 };
-    if (motionType === "CIRCULAR") {
-      const [x, y, z] = calcCircularProgressOffset(
-        [amplitudePoint.x, amplitudePoint.y, amplitudePoint.z],
-        [phasePoint.x, phasePoint.y, phasePoint.z],
-        amountOfMotion,
-        progress,
-      );
-      offset.x = x;
-      offset.y = y;
-      offset.z = z;
-    } else {
-      const middlePointArr = motionType === "LINEAR" ? null : [middlePoint.x, middlePoint.y, middlePoint.z];
-      const [x, y, z] = calcProgressOffset(
-        [startPoint.x, startPoint.y, startPoint.z],
-        middlePointArr,
-        [endPoint.x, endPoint.y, endPoint.z],
-        amountOfMotion,
-        progress,
-      );
-      offset.x = x;
-      offset.y = y;
-      offset.z = z;
-    }
+  const tickRender = () => {
+    tick(canvas, {
+      canvasSize,
+      timestamp: performance.now() / 1e3,
+      motionType,
+      animationDuration,
+      startPoint,
+      middlePoint,
+      endPoint,
+      isCircular,
+      isLoop,
+      isReverse,
+      amplitudePoint,
+      phasePoint,
+      amountOfMotion,
+    });
 
-    updateOffset(offset);
-
-    if (canvas) {
-      canvas.width = canvasSize.width;
-      canvas.height = canvasSize.height;
-      render(canvas as HTMLCanvasElement);
-    }
-
-    timer = requestAnimationFrame(tick);
+    timer = requestAnimationFrame(tickRender);
   };
-  timer = requestAnimationFrame(tick);
+  timer = requestAnimationFrame(tickRender);
+}
+
+function tick(
+  canvas: HTMLCanvasElement | null,
+  options: {
+    canvasSize: { width: number; height: number };
+    timestamp: number;
+    motionType: MotionType;
+    animationDuration: number;
+    startPoint: Point;
+    middlePoint: Point;
+    endPoint: Point;
+    isCircular: boolean;
+    isLoop: boolean;
+    isReverse: boolean;
+    amplitudePoint: Point;
+    phasePoint: Point;
+    amountOfMotion: number;
+  },
+) {
+  const {
+    canvasSize,
+    timestamp,
+    motionType,
+    startPoint,
+    middlePoint,
+    endPoint,
+    animationDuration,
+    isCircular,
+    isLoop,
+    isReverse,
+    amplitudePoint,
+    phasePoint,
+    amountOfMotion,
+  } = options;
+
+  const progress = calcProgress(timestamp / animationDuration, isCircular, isLoop, isReverse);
+  const offset = { x: 0, y: 0, z: 0 };
+  if (motionType === "CIRCULAR") {
+    const [x, y, z] = calcCircularProgressOffset(
+      [amplitudePoint.x, amplitudePoint.y, amplitudePoint.z],
+      [phasePoint.x, phasePoint.y, phasePoint.z],
+      amountOfMotion,
+      progress,
+    );
+    offset.x = x;
+    offset.y = y;
+    offset.z = z;
+  } else {
+    const middlePointArr = motionType === "LINEAR" ? null : [middlePoint.x, middlePoint.y, middlePoint.z];
+    const [x, y, z] = calcProgressOffset(
+      [startPoint.x, startPoint.y, startPoint.z],
+      middlePointArr,
+      [endPoint.x, endPoint.y, endPoint.z],
+      amountOfMotion,
+      progress,
+    );
+    offset.x = x;
+    offset.y = y;
+    offset.z = z;
+  }
+
+  updateOffset(offset);
+
+  if (canvas) {
+    canvas.width = canvasSize.width;
+    canvas.height = canvasSize.height;
+    render(canvas as HTMLCanvasElement);
+  }
 }
 
 function calcProgress(value: number, isCircular: boolean, loop: boolean, reverse: boolean): number {
@@ -144,4 +192,169 @@ function calcProgressOffset(
   );
 }
 
-export { bindCanvas, updateAnimationRender, calcProgressOffset };
+async function exportVideo(
+  size: { width: number; height: number },
+  exportDuration: number,
+  options: AnimationData & { progressCallback: (progress: number) => void },
+) {
+  const width = size.width % 2 === 0 ? size.width : size.width + 1;
+  const height = size.height % 2 === 0 ? size.height : size.height + 1;
+
+  const {
+    startPoint,
+    middlePoint,
+    endPoint,
+    animationDuration,
+    amountOfMotion,
+    amplitudePoint,
+    phasePoint,
+    enlarge,
+    focus,
+    edgeDilation,
+    motionType,
+    isLoop,
+    isReverse,
+    progressCallback,
+  } = options;
+
+  const fps = 30;
+  const GOP = 250;
+  const isCircular = motionType === "CIRCULAR";
+
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = width;
+  exportCanvas.height = height;
+  const ctx = exportCanvas.getContext("2d");
+  if (!ctx) {
+    return;
+  }
+
+  const totalFrames = Math.floor(exportDuration * fps);
+  const mp4box = MP4Box.createFile();
+  const trackOptions = {
+    timescale: 1_000_000,
+    width,
+    height,
+    nb_samples: totalFrames,
+    codec: "avc1.420029",
+    brands: ["isom", "iso2", "avc1", "mp42", "mp41"],
+  };
+
+  let trackId: number | null = null;
+  let outputCount = 0;
+  let encodeCount = 0;
+
+  const videoConfig = {
+    width,
+    height,
+    codec: "avc1.420029",
+    bitrate: 1000000,
+    framerate: fps,
+    alpha: "discard",
+
+    // https://github.com/gpac/mp4box.js/issues/243
+    avc: { format: "avc" },
+  };
+  await VideoEncoder.isConfigSupported(videoConfig as VideoEncoderConfig);
+
+  let resolveDone: (() => void) | null = null;
+  let rejectDone: ((reason?: Error) => void) | null = null;
+  const donePromise = new Promise<void>((resolve, reject) => {
+    resolveDone = resolve;
+    rejectDone = reject;
+  });
+
+  const encoder = new VideoEncoder({
+    error: e => {
+      rejectDone?.(e);
+    },
+    output: (chunk, config) => {
+      if (trackId === null) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        trackOptions.avcDecoderConfigRecord = config?.decoderConfig.description;
+        trackId = mp4box.addTrack(trackOptions);
+      }
+      const buf = new ArrayBuffer(chunk.byteLength);
+      chunk.copyTo(buf);
+      mp4box.addSample(trackId, buf, {
+        dts: chunk.timestamp,
+        cts: chunk.timestamp,
+        duration: chunk.duration,
+        is_sync: chunk.type === "key",
+        data: buf,
+      });
+      outputCount++;
+      if (outputCount === totalFrames) {
+        mp4box.save("3d-motion.mp4");
+        resolveDone?.();
+      }
+
+      progressCallback(clamp(outputCount / totalFrames, 0, 1));
+    },
+  });
+  encoder.configure(videoConfig as VideoEncoderConfig);
+
+  updateResolution(width, height);
+  updateEnlarge(enlarge);
+  updateFocus(focus);
+  updateDilation(edgeDilation);
+
+  let nextTime = 0;
+  while (encoder.state === "configured") {
+    if (encoder.encodeQueueSize > 10) {
+      await sleep(10);
+      continue;
+    }
+
+    const time = await new Promise<number>((resolve, reject) => {
+      if (nextTime > exportDuration) {
+        resolve(-1);
+        return;
+      }
+
+      const currentTime = nextTime;
+      try {
+        tick(exportCanvas, {
+          canvasSize: { width, height },
+          timestamp: currentTime,
+          motionType,
+          animationDuration,
+          startPoint,
+          middlePoint,
+          endPoint,
+          isCircular,
+          isLoop,
+          isReverse,
+          amplitudePoint,
+          phasePoint,
+          amountOfMotion,
+        });
+      } catch (e) {
+        reject(e);
+      }
+      nextTime = currentTime + 1 / fps;
+      resolve(currentTime);
+    });
+
+    if (time === -1) {
+      encoder.flush();
+      break;
+    }
+
+    const videoFrame = new VideoFrame(exportCanvas, {
+      timestamp: time * 1e6,
+      duration: (1 / fps) * 1e6,
+    });
+    encoder.encode(videoFrame, { keyFrame: encodeCount % GOP === 0 });
+    videoFrame.close();
+    encodeCount++;
+  }
+
+  await donePromise;
+  if (encoder.state !== "closed") {
+    encoder.close();
+  }
+}
+
+export { bindCanvas, updateAnimationRender, calcProgressOffset, exportVideo };

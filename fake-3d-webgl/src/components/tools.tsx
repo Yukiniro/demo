@@ -4,9 +4,10 @@ import { useToolsStore } from "../store/use-tools-store";
 import ManualSettingsControl from "./manual-settingsControl-control";
 import Presets from "./presets";
 import SelectImage from "./select-image";
-import { Divider, Slider } from "@douyinfe/semi-ui";
+import { Divider, Slider, Button } from "@douyinfe/semi-ui";
 import LabelSwitch from "./label-switch";
 import { IMAGE_INFO } from "../config";
+import { useExportStore } from "../store/use-export-store";
 
 function Tools() {
   const { setImages } = useTextureStore(state => ({
@@ -32,6 +33,8 @@ function Tools() {
       updateIsLoop: state.updateIsLoop,
       updateIsReverse: state.updateIsReverse,
     }));
+
+  const exportVideo = useExportStore(state => state.exportVideo);
 
   const handleChange = useCallback(
     (originalImageUrl: string, depthImageUrl: string): void => {
@@ -71,6 +74,12 @@ function Tools() {
 
   return (
     <div className="flex flex-col w-[400px] h-full absolute right-0 py-6 overflow-y-scroll">
+      <div className="flex justify-center items-center w-full py-2">
+        <Button onClick={exportVideo} block theme="solid" type="primary" size="large" style={{ marginRight: 8 }}>
+          Export Video
+        </Button>
+      </div>
+      <Divider />
       <div className="flex justify-between items-center gap-4 px-4 py-2">
         选择图片： <SelectImage handleChange={handleChange} />
       </div>
