@@ -1,18 +1,13 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { useTextureStore } from "../store/use-texture-store";
+import { useMemo } from "react";
 import { useToolsStore } from "../store/use-tools-store";
 import ManualSettingsControl from "./manual-settingsControl-control";
 import Presets from "./presets";
 import SelectImage from "./select-image";
 import { Divider, Slider, Button } from "@douyinfe/semi-ui";
 import LabelSwitch from "./label-switch";
-import { IMAGE_INFO } from "../config";
 import { useExportStore } from "../store/use-export-store";
 
 function Tools() {
-  const { setImages } = useTextureStore(state => ({
-    setImages: state.setImages,
-  }));
   const { amount, animationDuration, focus, edgeDilation, isLoop, isReverse, isLoopDisabled, isReverseDisabled } =
     useToolsStore(state => ({
       amount: state.amount,
@@ -35,13 +30,6 @@ function Tools() {
     }));
 
   const exportVideo = useExportStore(state => state.exportVideo);
-
-  const handleChange = useCallback(
-    (originalImageUrl: string, depthImageUrl: string): void => {
-      setImages(originalImageUrl, depthImageUrl);
-    },
-    [setImages],
-  );
 
   const commonSettings = useMemo(() => {
     return [
@@ -68,14 +56,6 @@ function Tools() {
     updateFocus,
   ]);
 
-  useEffect(() => {
-    // production 环境，没有 setTimeout 会存在问题
-    // TODO 优化这里的特殊处理
-    setTimeout(() => {
-      handleChange(IMAGE_INFO[0].originalImageUrl, IMAGE_INFO[0].depthImageUrl);
-    }, 150);
-  }, [handleChange]);
-
   return (
     <div className="flex flex-col w-[400px] h-full absolute right-0 py-6 overflow-y-scroll">
       <div className="flex justify-center items-center w-full py-2">
@@ -85,7 +65,7 @@ function Tools() {
       </div>
       <Divider />
       <div className="flex justify-between items-center gap-4 px-4 py-2">
-        选择图片： <SelectImage handleChange={handleChange} />
+        选择图片： <SelectImage />
       </div>
       <Divider />
       <LabelSwitch label="Loop" checked={isLoop} disabled={isLoopDisabled} onChange={updateIsLoop} />

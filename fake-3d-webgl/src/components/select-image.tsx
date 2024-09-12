@@ -1,21 +1,29 @@
 import { Select } from "@douyinfe/semi-ui";
 import { IMAGE_INFO } from "../config";
+import { useTextureStore } from "../store/use-texture-store";
 
-interface SelectImageProps {
-  handleChange: (originalImageUrl: string, depthImageUrl: string) => void;
-}
+function SelectImage() {
+  const { setImages, setPresetImageIndex, presetImageIndex } = useTextureStore(state => ({
+    setImages: state.setImages,
+    setPresetImageIndex: state.setPresetImageIndex,
+    presetImageIndex: state.presetImageIndex,
+  }));
 
-function SelectImage(props: SelectImageProps) {
   const handleChange = (value: string) => {
-    const info = IMAGE_INFO.find(item => item.name === value);
+    const index = IMAGE_INFO.findIndex(item => item.name === value);
+    setPresetImageIndex(index);
+    const info = IMAGE_INFO[index];
     if (info) {
-      props.handleChange(info.originalImageUrl, info.depthImageUrl);
+      setImages(info.originalImageUrl, info.depthImageUrl);
     }
   };
+
+  const value = presetImageIndex === -1 ? "None" : IMAGE_INFO[presetImageIndex].name;
+
   return (
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    <Select defaultValue={IMAGE_INFO[0].name} style={{ width: 120 }} onChange={handleChange}>
+    <Select value={value} style={{ width: 120 }} onChange={handleChange}>
       {IMAGE_INFO.map(item => (
         <Select.Option key={item.name} value={item.name}>
           {item.name}
