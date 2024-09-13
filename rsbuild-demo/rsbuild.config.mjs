@@ -4,7 +4,15 @@ import { pluginSvgr } from "@rsbuild/plugin-svgr";
 import { pluginLess } from "@rsbuild/plugin-less";
 
 export default defineConfig({
-  plugins: [pluginReact(), pluginSvgr(), pluginLess()],
+  plugins: [
+    pluginReact(),
+    pluginSvgr({
+      svgrOptions: {
+        exportType: "named",
+      },
+    }),
+    pluginLess(),
+  ],
   source: {
     entry: {
       main: "./src/index.jsx",
