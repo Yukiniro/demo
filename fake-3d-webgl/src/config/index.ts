@@ -1,15 +1,16 @@
-import originalMountImageUrl from "../assets/mount.jpg";
-import depthMountImageUrl from "../assets/mount-map.jpg";
-import originalBallImageUrl from "../assets/ball.jpg";
-import depthBallImageUrl from "../assets/ball-map.jpg";
-import originalCanyonImageUrl from "../assets/canyon.jpg";
-import depthCanyonImageUrl from "../assets/canyon-map.jpg";
-import originalLadyImageUrl from "../assets/lady.jpg";
-import depthLadyImageUrl from "../assets/lady-map.jpg";
-import originalDogImageUrl from "../assets/dog.jpg";
-import depthDogImageUrl from "../assets/dog-map.png";
-import originalDogPhotoImageUrl from "../assets/dog-photo.jpg";
-import depthDogPhotoImageUrl from "../assets/dog-depth-map.jpg";
+/* eslint-disable import/no-absolute-path */
+import originalMountImageUrl from "/image/mount.jpg";
+import depthMountImageUrl from "/image/mount-map.jpg";
+import originalBallImageUrl from "/image/ball.jpg";
+import depthBallImageUrl from "/image/ball-map.jpg";
+import originalCanyonImageUrl from "/image/canyon.jpg";
+import depthCanyonImageUrl from "/image/canyon-map.jpg";
+import originalLadyImageUrl from "/image/lady.jpg";
+import depthLadyImageUrl from "/image/lady-map.jpg";
+import originalDogImageUrl from "/image/dog.jpg";
+import depthDogImageUrl from "/image/dog-map.png";
+import originalDogPhotoImageUrl from "/image/dog-photo.jpg";
+import depthDogPhotoImageUrl from "/image/dog-depth-map.jpg";
 
 export const IMAGE_INFO = [
   {

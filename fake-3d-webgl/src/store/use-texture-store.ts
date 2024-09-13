@@ -7,6 +7,7 @@ type State = {
   originalImageUrl: string;
   depthMapImageUrl: string;
   pending: boolean;
+  isGenerating: boolean;
   error: Error | null;
   viewSize: { width: number; height: number };
   canvasSize: { width: number; height: number };
@@ -23,6 +24,7 @@ type Action = {
     viewSize: { width: number; height: number },
   ) => void;
   setPresetImageIndex: (index: number) => void;
+  setIsGenerating: (isGenerating: boolean) => void;
 };
 
 export const useTextureStore = create<State & Action>((set, get) => ({
@@ -34,6 +36,7 @@ export const useTextureStore = create<State & Action>((set, get) => ({
   viewSize: { width: 0, height: 0 },
   canvasSize: { width: 0, height: 0 },
   imageSize: { width: 0, height: 0 },
+  isGenerating: false,
   init: () => {
     initRenderStore();
   },
@@ -89,5 +92,8 @@ export const useTextureStore = create<State & Action>((set, get) => ({
     set({ canvasSize });
     updateResolution(canvasSize.width, canvasSize.height);
     useToolsStore.getState().triggerAnimationRender();
+  },
+  setIsGenerating: (isGenerating: boolean) => {
+    set({ isGenerating });
   },
 }));

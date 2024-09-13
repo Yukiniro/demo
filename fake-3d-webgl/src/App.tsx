@@ -9,13 +9,15 @@ import ExportView from "./components/export-view";
 import SelectImage from "./components/select-image";
 import PreviewBox from "./components/preview-box";
 import UploadImage from "./components/upload-image";
+import LoadingView from "./components/loading-view";
 
 function App() {
-  const { pending, error, originalImageUrl } = useTextureStore(state => {
+  const { pending, isGenerating, error, originalImageUrl } = useTextureStore(state => {
     return {
       pending: state.pending,
       error: state.error,
       originalImageUrl: state.originalImageUrl,
+      isGenerating: state.isGenerating,
     };
   });
   const isExporting = useExportStore(state => state.isExporting);
@@ -38,6 +40,7 @@ function App() {
           <p>或者</p>
           <UploadImage />
         </div>
+        {(pending || isGenerating) && <LoadingView />}
       </Layout>
     );
   }
@@ -48,13 +51,9 @@ function App() {
         <PreviewBox />
         <Divider className="absolute h-full right-[400px]" layout="vertical" />
         <Tools />
-        {pending && (
-          <div className="fixed top-0 left-0 w-full h-full bg-black opacity-75 flex justify-center items-center">
-            Loading...
-          </div>
-        )}
       </div>
       {isExporting && <ExportView />}
+      {(pending || isGenerating) && <LoadingView />}
     </Layout>
   );
 }
