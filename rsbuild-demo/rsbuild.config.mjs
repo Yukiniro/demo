@@ -1,9 +1,10 @@
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 import { pluginSvgr } from "@rsbuild/plugin-svgr";
+import { pluginLess } from "@rsbuild/plugin-less";
 
 export default defineConfig({
-  plugins: [pluginReact(), pluginSvgr()],
+  plugins: [pluginReact(), pluginSvgr(), pluginLess()],
   source: {
     entry: {
       main: "./src/index.jsx",
