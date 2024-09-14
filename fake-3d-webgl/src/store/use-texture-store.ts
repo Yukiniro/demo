@@ -69,7 +69,22 @@ export const useTextureStore = create<State & Action>((set, get) => ({
 
       const originalImage = await loadImage(originalImageUrl);
       const depthMapImage = await loadImage(depthMapImageUrl);
-      updateTexture(originalImage, depthMapImage);
+
+      if (originalImage.width !== depthMapImage.width || originalImage.height !== depthMapImage.height) {
+        const canvas = document.createElement("canvas");
+        canvas.width = originalImage.width;
+        canvas.height = originalImage.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(depthMapImage, 0, 0, originalImage.width, originalImage.height);
+          const resizedDepthMapImageUrl = canvas.toDataURL();
+          const resizedDepthMapImage = await loadImage(resizedDepthMapImageUrl);
+          set({ depthMapImageUrl: resizedDepthMapImageUrl });
+          updateTexture(originalImage, resizedDepthMapImage);
+        }
+      } else {
+        updateTexture(originalImage, depthMapImage);
+      }
 
       const imageSize = { width: originalImage.width, height: originalImage.height };
       set({ imageSize });

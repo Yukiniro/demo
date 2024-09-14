@@ -3,6 +3,8 @@ import originalMountImageUrl from "/image/mount.jpg";
 import depthMountImageUrl from "/image/mount-map.jpg";
 import originalBallImageUrl from "/image/ball.jpg";
 import depthBallImageUrl from "/image/ball-map.jpg";
+// import depthBallImageUrl from "/image/ball-map-midas.png";
+// import depthBallImageUrl from "/image/ball-map-immersity.png";
 import originalCanyonImageUrl from "/image/canyon.jpg";
 import depthCanyonImageUrl from "/image/canyon-map.jpg";
 import originalLadyImageUrl from "/image/lady.jpg";
@@ -53,7 +55,7 @@ export const PRESET_TYPE_MAP = {
     amount: 0.4,
     animationDuration: 4,
     focus: 0.5,
-    edgeDilation: 0,
+    edgeDilation: 0.4,
     isLoop: true,
     isReverse: false,
     isLoopDisabled: false,
@@ -66,7 +68,7 @@ export const PRESET_TYPE_MAP = {
     amount: 0.4,
     animationDuration: 4,
     focus: 0.5,
-    edgeDilation: 0,
+    edgeDilation: 0.4,
     isLoop: true,
     isReverse: false,
     isLoopDisabled: false,
@@ -79,7 +81,7 @@ export const PRESET_TYPE_MAP = {
     amount: 0.4,
     animationDuration: 8,
     focus: 0.5,
-    edgeDilation: 0,
+    edgeDilation: 0.4,
     isLoop: true,
     isReverse: false,
     isLoopDisabled: true,
@@ -92,7 +94,7 @@ export const PRESET_TYPE_MAP = {
     amount: 0.4,
     animationDuration: 8,
     focus: 0.5,
-    edgeDilation: 0,
+    edgeDilation: 0.4,
     isLoop: true,
     isReverse: false,
     isLoopDisabled: true,
@@ -105,7 +107,7 @@ export const PRESET_TYPE_MAP = {
     amount: 0.4,
     animationDuration: 8,
     focus: 1,
-    edgeDilation: 0,
+    edgeDilation: 0.4,
     isLoop: true,
     isReverse: false,
     isLoopDisabled: false,
@@ -118,7 +120,7 @@ export const PRESET_TYPE_MAP = {
     amount: 0.65,
     animationDuration: 10,
     focus: 0.5,
-    edgeDilation: 0,
+    edgeDilation: 0.4,
     isLoop: false,
     isReverse: false,
     isLoopDisabled: false,
@@ -132,7 +134,7 @@ export const PRESET_TYPE_MAP = {
     amount: 0.4,
     animationDuration: 10,
     focus: 1,
-    edgeDilation: 0,
+    edgeDilation: 0.4,
     isLoop: false,
     isReverse: false,
     isLoopDisabled: false,
@@ -146,7 +148,7 @@ export const PRESET_TYPE_MAP = {
     amount: 0.4,
     animationDuration: 10,
     focus: 1,
-    edgeDilation: 0,
+    edgeDilation: 0.4,
     isLoop: false,
     isReverse: false,
     isLoopDisabled: false,
@@ -160,7 +162,7 @@ export const PRESET_TYPE_MAP = {
     amount: 0.4,
     animationDuration: 10,
     focus: 1,
-    edgeDilation: 0,
+    edgeDilation: 0.4,
     isLoop: false,
     isReverse: false,
     isLoopDisabled: false,
@@ -168,3 +170,5 @@ export const PRESET_TYPE_MAP = {
   },
   Custom: null,
 };
+
+export const VERSION = "0.0.2";

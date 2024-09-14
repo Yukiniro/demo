@@ -10,6 +10,7 @@ import SelectImage from "./components/select-image";
 import PreviewBox from "./components/preview-box";
 import UploadImage from "./components/upload-image";
 import LoadingView from "./components/loading-view";
+import { VERSION } from "./config";
 
 function App() {
   const { pending, isGenerating, error, originalImageUrl } = useTextureStore(state => {
@@ -22,6 +23,10 @@ function App() {
   });
   const isExporting = useExportStore(state => state.isExporting);
   const init = useTextureStore(state => state.init);
+
+  useEffect(() => {
+    console.log("fake-3d app version:", VERSION);
+  }, []);
 
   useEffect(() => init(), [init]);
 

@@ -48,6 +48,7 @@ type State = {
   presetType: PresetType;
   isLoopDisabled: boolean;
   isReverseDisabled: boolean;
+  depthMapOpacity: number;
 };
 
 type Action = {
@@ -66,6 +67,7 @@ type Action = {
   updateIsLoop: (isLoop: boolean) => void;
   updateIsReverse: (isReverse: boolean) => void;
   getAnimationData: () => AnimationData;
+  updateDepthMapOpacity: (depthMapOpacity: number) => void;
 };
 
 export const useToolsStore = create<State & Action>((set, get) => ({
@@ -84,6 +86,10 @@ export const useToolsStore = create<State & Action>((set, get) => ({
   isReverseDisabled: false,
   isLoop: true,
   isReverse: false,
+  depthMapOpacity: 0,
+  updateDepthMapOpacity: (depthMapOpacity: number) => {
+    set({ depthMapOpacity });
+  },
   updateIsLoop: (isLoop: boolean) => {
     set({ isLoop, presetType: "Custom" });
     get().triggerAnimationRender();

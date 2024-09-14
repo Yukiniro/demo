@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useToolsStore } from "../store/use-tools-store";
 import ManualSettingsControl from "./manual-settingsControl-control";
 import Presets from "./presets";
@@ -8,26 +8,44 @@ import LabelSwitch from "./label-switch";
 import { useExportStore } from "../store/use-export-store";
 
 function Tools() {
-  const { amount, animationDuration, focus, edgeDilation, isLoop, isReverse, isLoopDisabled, isReverseDisabled } =
-    useToolsStore(state => ({
-      amount: state.amount,
-      animationDuration: state.animationDuration,
-      focus: state.focus,
-      edgeDilation: state.edgeDilation,
-      isLoop: state.isLoop,
-      isReverse: state.isReverse,
-      isLoopDisabled: state.isLoopDisabled,
-      isReverseDisabled: state.isReverseDisabled,
-    }));
-  const { updateAmount, updateAnimationDuration, updateFocus, updateEdgeDilation, updateIsLoop, updateIsReverse } =
-    useToolsStore(state => ({
-      updateAmount: state.updateAmount,
-      updateAnimationDuration: state.updateAnimationDuration,
-      updateFocus: state.updateFocus,
-      updateEdgeDilation: state.updateEdgeDilation,
-      updateIsLoop: state.updateIsLoop,
-      updateIsReverse: state.updateIsReverse,
-    }));
+  const {
+    amount,
+    animationDuration,
+    focus,
+    edgeDilation,
+    isLoop,
+    isReverse,
+    isLoopDisabled,
+    isReverseDisabled,
+    depthMapOpacity,
+  } = useToolsStore(state => ({
+    amount: state.amount,
+    animationDuration: state.animationDuration,
+    focus: state.focus,
+    edgeDilation: state.edgeDilation,
+    isLoop: state.isLoop,
+    isReverse: state.isReverse,
+    isLoopDisabled: state.isLoopDisabled,
+    isReverseDisabled: state.isReverseDisabled,
+    depthMapOpacity: state.depthMapOpacity,
+  }));
+  const {
+    updateAmount,
+    updateAnimationDuration,
+    updateFocus,
+    updateEdgeDilation,
+    updateIsLoop,
+    updateIsReverse,
+    updateDepthMapOpacity,
+  } = useToolsStore(state => ({
+    updateAmount: state.updateAmount,
+    updateAnimationDuration: state.updateAnimationDuration,
+    updateFocus: state.updateFocus,
+    updateEdgeDilation: state.updateEdgeDilation,
+    updateIsLoop: state.updateIsLoop,
+    updateIsReverse: state.updateIsReverse,
+    updateDepthMapOpacity: state.updateDepthMapOpacity,
+  }));
 
   const exportVideo = useExportStore(state => state.exportVideo);
 
@@ -56,6 +74,15 @@ function Tools() {
     updateFocus,
   ]);
 
+  const handleDepthMapOpacityChange = useCallback(
+    (value: number | number[] | undefined) => {
+      if (typeof value === "number") {
+        updateDepthMapOpacity(value);
+      }
+    },
+    [updateDepthMapOpacity],
+  );
+
   return (
     <div className="flex flex-col w-[400px] h-full absolute right-0 py-6 overflow-y-scroll">
       <div className="flex justify-center items-center w-full py-2">
@@ -66,6 +93,19 @@ function Tools() {
       <Divider />
       <div className="flex justify-between items-center gap-4 px-4 py-2">
         选择图片： <SelectImage />
+      </div>
+      <Divider />
+      <div className="flex justify-between items-center gap-4 px-4 py-4">
+        <span>深度图透明度</span>
+        <Slider
+          className="w-[200px]"
+          min={0}
+          max={100}
+          step={1}
+          onChange={handleDepthMapOpacityChange as (value: number | number[] | undefined) => void}
+          value={depthMapOpacity}
+          showBoundary
+        ></Slider>
       </div>
       <Divider />
       <LabelSwitch label="Loop" checked={isLoop} disabled={isLoopDisabled} onChange={updateIsLoop} />
