@@ -1,3 +1,3 @@
-import { hello } from "./lib.js";
+import { foo } from "./lib";
 
-hello();
+console.log(foo);

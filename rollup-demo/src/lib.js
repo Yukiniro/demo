@@ -1,23 +1,22 @@
-class Person {
-  constructor(name) {
-    this.name = name;
-  }
+export const foo = "foo";
+export const bar = "bar";
 
-  sayHello() {
-    console.log(`Hello, my name is ${this.name}`);
-  }
+console.log("lib");
+
+function hello() {
+  console.log("hello world");
+  return;
+  console.log("hello world after return");
 }
 
-const A = Person;
-
-Array.prototype.hello = function () {
-  console.log("hello world");
-};
-
-export function hello() {
-  console.log("hello world");
+function world() {
+  console.log("world");
 }
 
-export function goodbye() {
-  console.log("goodbye world");
+hello();
+
+window.hello = hello;
+
+if (false) {
+  console.log("hello world in if");
 }
