@@ -1,0 +1,20 @@
+{
+  "name": "woker-transfer-bench",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "rsbuild dev --open",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "^1.0.13",
+    "@rsbuild/plugin-less": "^1.0.1",
+    "@rsbuild/plugin-react": "^1.0.3",
+    "tinybench": "^2.9.0"
+  }
+}
