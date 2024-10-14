@@ -8,13 +8,13 @@
     "preview": "rsbuild preview"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@rsbuild/core": "^1.0.2",
+    "@rsbuild/core": "^1.0.13",
     "@rsbuild/plugin-less": "^1.0.1",
-    "@rsbuild/plugin-react": "^1.0.1",
-    "@rsbuild/plugin-svgr": "^1.0.1"
+    "@rsbuild/plugin-react": "^1.0.3",
+    "@rsbuild/plugin-svgr": "^1.0.3"
   }
 }
