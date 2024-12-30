@@ -1,9 +1,42 @@
 import Konva from "konva";
+import hotkeys from "hotkeys-js";
+import { nanoid } from "nanoid";
 
 let stage: Konva.Stage | null = null;
 let layer: Konva.Layer | null = null;
+let aiPreviewLayer: Konva.Layer | null = null;
 const selection = new Konva.Transformer();
 let selectionRectangle: Konva.Rect | null = null;
+let animation: Konva.Animation | null = null;
+let isAiPreviewing = false;
+
+function clearBlur() {
+  document.activeElement instanceof HTMLElement && document.activeElement.blur();
+}
+
+hotkeys("escape", function () {
+  clearBlur();
+  clearAiPreview();
+});
+
+hotkeys("space", function () {
+  clearBlur();
+  applyAiPreview();
+});
+
+hotkeys("backspace, delete", function () {
+  clearBlur();
+  clearAiPreview();
+  selection.nodes().forEach(node => {
+    node.remove();
+  });
+  selection.nodes([]);
+});
+
+hotkeys("/", function () {
+  clearBlur();
+  inference();
+});
 
 export function initApp(container: HTMLDivElement) {
   const { width, height } = container.getBoundingClientRect();
@@ -23,6 +56,20 @@ export function initApp(container: HTMLDivElement) {
   layer = new Konva.Layer();
   stage.add(layer);
 
+  aiPreviewLayer = new Konva.Layer({
+    listening: false,
+    draggable: false,
+  });
+  stage.add(aiPreviewLayer);
+  let alpha = 0;
+  animation = new Konva.Animation(frame => {
+    alpha = (alpha + (frame?.timeDiff ?? 0) / 2000) % 1;
+    const animationElement = aiPreviewLayer?.findOne(".animation");
+    if (animationElement) {
+      animationElement.opacity(alpha);
+    }
+  }, aiPreviewLayer);
+
   selectionRectangle = new Konva.Rect({
     fill: "rgba(0,0,255,0.5)",
     visible: false,
@@ -37,6 +84,7 @@ export function initApp(container: HTMLDivElement) {
   let y2 = 0;
   let selecting = false;
   stage.on("mousedown touchstart", e => {
+    clearAiPreview();
     if (e.target !== stage) {
       return;
     }
@@ -88,6 +136,7 @@ export function initApp(container: HTMLDivElement) {
   });
 
   stage.on("click tap", e => {
+    clearAiPreview();
     if (selectionRectangle?.visible()) {
       return;
     }
@@ -126,11 +175,76 @@ function newElement(element: Konva.Text | Konva.Rect) {
   selection.setNodes([element]);
 }
 
+// 推理
+function inference() {
+  const jsonList = selection.nodes().map(node => JSON.parse(node.toJSON()));
+  jsonList.forEach(json => {
+    switch (json.className) {
+      case "Text":
+        json.attrs.text = "best wishes";
+        break;
+      case "Rect":
+        json.attrs.fill = "blue";
+        break;
+    }
+  });
+  updateAiPreview(JSON.stringify(jsonList));
+}
+
+function updateAiPreview(data: string) {
+  isAiPreviewing = true;
+  const jsonList = JSON.parse(data);
+  const elements = jsonList.map((json: unknown) => {
+    return Konva.Node.create(json);
+  });
+  const group = new Konva.Group({ name: "animation" });
+  group.add(...elements);
+  const backRect = new Konva.Rect({ fill: "rgba(255,165,0,0.6)", width: 1000, height: 1000 });
+  const { x, y, width, height } = group.getClientRect();
+  backRect.position({ x, y });
+  backRect.size({ width, height });
+
+  aiPreviewLayer?.add(backRect);
+  aiPreviewLayer?.add(group);
+
+  animation?.start();
+}
+
+function clearAiPreview() {
+  isAiPreviewing = false;
+  animation?.stop();
+  aiPreviewLayer?.removeChildren();
+}
+
+function applyAiPreview() {
+  if (!isAiPreviewing) {
+    return;
+  }
+  const animationElement = aiPreviewLayer?.findOne(".animation");
+  if (!animationElement) {
+    return;
+  }
+  (animationElement as Konva.Group).children.forEach(node => {
+    const id = node.id();
+    const element = layer?.findOne(`#${id}`);
+    if (element) {
+      element.setAttrs(Object.assign({}, element.attrs, node.attrs));
+    }
+  });
+  clearAiPreview();
+}
+
 export function addText() {
   if (!layer || !stage) {
     return;
   }
-  const textNode = new Konva.Text({ text: "hello world", fontSize: 60, fontFamily: "Arial", draggable: true });
+  const textNode = new Konva.Text({
+    text: "hello world",
+    fontSize: 60,
+    fontFamily: "Arial",
+    draggable: true,
+    id: nanoid(),
+  });
   newElement(textNode);
 }
 
@@ -138,6 +252,6 @@ export function addRect() {
   if (!layer || !stage) {
     return;
   }
-  const rect = new Konva.Rect({ width: 200, height: 200, fill: "red", draggable: true });
+  const rect = new Konva.Rect({ width: 200, height: 200, fill: "red", draggable: true, id: nanoid() });
   newElement(rect);
 }
