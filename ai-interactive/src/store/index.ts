@@ -1,14 +1,50 @@
 import Konva from "konva";
 import hotkeys from "hotkeys-js";
 import { nanoid } from "nanoid";
+import { emitter } from "./mitt-store";
 
 let stage: Konva.Stage | null = null;
 let layer: Konva.Layer | null = null;
 let aiPreviewLayer: Konva.Layer | null = null;
 const selection = new Konva.Transformer();
 let selectionRectangle: Konva.Rect | null = null;
-let animation: Konva.Animation | null = null;
 let isAiPreviewing = false;
+
+const textList: Record<string, string[]> = {
+  "new year": ["New Year Starts!", "Joy, Hope, Love.", "Fresh Day Begins!", "Time Flies Fast!"],
+  "happy birthday": ["Happy Birthday!", "Fun Times Here!", "Party Time Now!", "Cake Time Fun!"],
+  travel: ["Go Far Now!", "See New Lands!", "Travel Starts Here!", "Fun Road Ahead!"],
+};
+
+const styleList = [
+  {
+    fontFamily: "Comic Sans MS",
+    fill: "transparent",
+    stroke: "rgba(0,0,0,0.5)",
+    strokeWidth: 2,
+  },
+  {
+    fontFamily: "Bookman",
+    fill: "#FF69B4",
+    stroke: "#FF1493",
+    strokeWidth: 1,
+    shadowColor: "#FFB6C1",
+    shadowBlur: 10,
+    shadowOffset: { x: 5, y: 5 },
+    shadowOpacity: 0.8,
+  },
+  {
+    fontFamily: "Impact",
+    fill: "#4CAF50",
+    stroke: "#2E7D32",
+    strokeWidth: 4,
+    shadowColor: "#81C784",
+    shadowBlur: 20,
+    shadowOffset: { x: 10, y: 10 },
+    shadowOpacity: 0.8,
+  },
+];
+let interfaceType = "";
 
 function clearBlur() {
   document.activeElement instanceof HTMLElement && document.activeElement.blur();
@@ -38,6 +74,15 @@ hotkeys("/", function () {
   inference();
 });
 
+emitter.on("text-edit", text => {
+  selection.nodes().forEach(node => {
+    if (node.className === "Text") {
+      (node as Konva.Text).text(text);
+    }
+  });
+  interfaceType = "changet-text";
+});
+
 export function initApp(container: HTMLDivElement) {
   const { width, height } = container.getBoundingClientRect();
   stage = new Konva.Stage({
@@ -61,14 +106,6 @@ export function initApp(container: HTMLDivElement) {
     draggable: false,
   });
   stage.add(aiPreviewLayer);
-  let alpha = 0;
-  animation = new Konva.Animation(frame => {
-    alpha = (alpha + (frame?.timeDiff ?? 0) / 2000) % 1;
-    const animationElement = aiPreviewLayer?.findOne(".animation");
-    if (animationElement) {
-      animationElement.opacity(alpha);
-    }
-  }, aiPreviewLayer);
 
   selectionRectangle = new Konva.Rect({
     fill: "rgba(0,0,255,0.5)",
@@ -160,6 +197,15 @@ export function initApp(container: HTMLDivElement) {
       selection.nodes(nodes);
     }
   });
+
+  stage.on("dblclick", e => {
+    if (e.target === stage) {
+      return;
+    }
+    if (e.target.className === "Text") {
+      emitter.emit("dblclick-text", (e.target as Konva.Text).text());
+    }
+  });
 }
 
 function newElement(element: Konva.Text | Konva.Rect) {
@@ -178,16 +224,58 @@ function newElement(element: Konva.Text | Konva.Rect) {
 // 推理
 function inference() {
   const jsonList = selection.nodes().map(node => JSON.parse(node.toJSON()));
-  jsonList.forEach(json => {
-    switch (json.className) {
-      case "Text":
-        json.attrs.text = "best wishes";
-        break;
-      case "Rect":
-        json.attrs.fill = "blue";
-        break;
+  if (interfaceType === "changet-text") {
+    let contentList: string[] = [];
+    const keys = Object.keys(textList);
+    for (let i = 0; i < jsonList.length; i++) {
+      const json = jsonList[i];
+      if (json.className === "Text") {
+        const key = keys.find(key => {
+          const words1 = json.attrs.text.toLowerCase().split(/\s+/);
+          const words2 = key.toLowerCase().split(/\s+/);
+          return words1.some((word: string) => words2.includes(word));
+        });
+        if (key) {
+          contentList = textList[key];
+          break;
+        }
+      }
     }
+
+    if (contentList.length === 0) {
+      interfaceType = "change-style";
+      inference();
+      return;
+    }
+
+    if (jsonList.length < 4) {
+      const item = JSON.parse(JSON.stringify(jsonList[jsonList.length - 1]));
+      item.attrs.id = nanoid();
+      item.attrs.y += 60;
+      jsonList.push(item);
+    }
+    jsonList.forEach((json, index) => {
+      json.attrs.text = contentList[index];
+    });
+  } else if (interfaceType === "change-style") {
+    const styleIndex = Math.floor(Math.random() * styleList.length);
+    const style = styleList[styleIndex];
+    jsonList.forEach(json => {
+      json.attrs = {
+        ...json.attrs,
+        ...style,
+      };
+    });
+  } else {
+    interfaceType = "changet-text";
+    inference();
+    return;
+  }
+
+  selection.nodes().forEach(node => {
+    node.visible(false);
   });
+  selection.visible(false);
   updateAiPreview(JSON.stringify(jsonList));
 }
 
@@ -206,14 +294,15 @@ function updateAiPreview(data: string) {
 
   aiPreviewLayer?.add(backRect);
   aiPreviewLayer?.add(group);
-
-  animation?.start();
 }
 
 function clearAiPreview() {
   isAiPreviewing = false;
-  animation?.stop();
   aiPreviewLayer?.removeChildren();
+  selection.nodes().forEach(node => {
+    node.visible(true);
+  });
+  selection.visible(true);
 }
 
 function applyAiPreview() {
@@ -229,9 +318,15 @@ function applyAiPreview() {
     const element = layer?.findOne(`#${id}`);
     if (element) {
       element.setAttrs(Object.assign({}, element.attrs, node.attrs));
+    } else {
+      layer?.add(node);
     }
   });
   clearAiPreview();
+
+  if (interfaceType === "changet-text") {
+    selection.nodes(layer?.find("Text") ?? []);
+  }
 }
 
 export function addText() {
@@ -248,10 +343,8 @@ export function addText() {
   newElement(textNode);
 }
 
-export function addRect() {
-  if (!layer || !stage) {
-    return;
-  }
-  const rect = new Konva.Rect({ width: 200, height: 200, fill: "red", draggable: true, id: nanoid() });
-  newElement(rect);
+export function setText(text: string) {
+  const textNode = selection.nodes()[0] as Konva.Text;
+  textNode.text(text);
+  interfaceType = "changet-text";
 }

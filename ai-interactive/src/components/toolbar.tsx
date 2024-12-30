@@ -1,23 +1,20 @@
 "use client";
 
-import { Type, Square } from "lucide-react";
+// import { Type, Square } from "lucide-react";
+import { Type } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Toggle } from "@/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { addRect, addText } from "@/store";
+import { addText } from "@/store";
 
 export default function Toolbar() {
   const tools = [
     { icon: Type, label: "Text" },
-    { icon: Square, label: "Shape" },
+    // { icon: Square, label: "Shape" },
   ];
 
   const handleAddText = () => {
     addText();
-  };
-
-  const handleNewRect = () => {
-    addRect();
   };
 
   return (
@@ -28,7 +25,7 @@ export default function Toolbar() {
             <Tooltip key={tool.label}>
               <TooltipTrigger asChild>
                 <Toggle
-                  onClick={tool.label === "Text" ? handleAddText : handleNewRect}
+                  onClick={tool.label === "Text" ? handleAddText : () => {}}
                   variant="outline"
                   size="sm"
                   className="data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
