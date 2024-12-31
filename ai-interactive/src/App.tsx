@@ -15,7 +15,7 @@ function App() {
 
   return (
     <div className="flex items-center justify-center flex-col w-full h-full bg-gray-200">
-      <div className="w-[1280px] h-[720px] bg-white" ref={containerRef}></div>
+      <div className="w-2/3 h-2/3 bg-white" ref={containerRef}></div>
       <Toolbar />
       <TextEdit />
     </div>

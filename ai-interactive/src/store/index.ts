@@ -44,6 +44,7 @@ const styleList = [
     shadowOpacity: 0.8,
   },
 ];
+let curStyleIndex = 0;
 let interfaceType = "";
 
 function clearBlur() {
@@ -80,7 +81,7 @@ emitter.on("text-edit", text => {
       (node as Konva.Text).text(text);
     }
   });
-  interfaceType = "changet-text";
+  updateInterfaceType("changet-text");
 });
 
 export function initApp(container: HTMLDivElement) {
@@ -221,9 +222,15 @@ function newElement(element: Konva.Text | Konva.Rect) {
   selection.setNodes([element]);
 }
 
+function updateInterfaceType(type: string) {
+  interfaceType = type;
+  console.trace("updateInterfaceType", type);
+}
+
 // 推理
 function inference() {
-  const jsonList = selection.nodes().map(node => JSON.parse(node.toJSON()));
+  const allSelection = selection.nodes();
+  const jsonList = allSelection.map(node => JSON.parse(node.toJSON()));
   if (interfaceType === "changet-text") {
     let contentList: string[] = [];
     const keys = Object.keys(textList);
@@ -243,7 +250,7 @@ function inference() {
     }
 
     if (contentList.length === 0) {
-      interfaceType = "change-style";
+      updateInterfaceType("change-style");
       inference();
       return;
     }
@@ -251,14 +258,22 @@ function inference() {
     if (jsonList.length < 4) {
       const item = JSON.parse(JSON.stringify(jsonList[jsonList.length - 1]));
       item.attrs.id = nanoid();
-      item.attrs.y += 60;
+      item.attrs.y += allSelection[jsonList.length - 1].height();
       jsonList.push(item);
+    } else if (jsonList[0].attrs.text === contentList[0]) {
+      updateInterfaceType("");
+      inference();
+      return;
     }
     jsonList.forEach((json, index) => {
       json.attrs.text = contentList[index];
     });
   } else if (interfaceType === "change-style") {
-    const styleIndex = Math.floor(Math.random() * styleList.length);
+    let styleIndex = curStyleIndex;
+    while (styleIndex === curStyleIndex) {
+      styleIndex = Math.floor(Math.random() * styleList.length);
+    }
+    curStyleIndex = styleIndex;
     const style = styleList[styleIndex];
     jsonList.forEach(json => {
       json.attrs = {
@@ -266,8 +281,35 @@ function inference() {
         ...style,
       };
     });
+    updateInterfaceType("");
+  } else if (interfaceType === "layout") {
+    const layoutIndex = Math.random() < 0.5 ? 0 : 1;
+    switch (layoutIndex) {
+      case 0: {
+        const height = allSelection.reduce((acc, node) => acc + node.height(), 0);
+        const { height: stageHeight } = stage?.size() ?? { width: 0, height: 0 };
+        jsonList.forEach((json, idx) => {
+          json.attrs.x = jsonList[0].attrs.x;
+          json.attrs.y = (stageHeight - height) / 2 + allSelection[idx].height() * idx;
+        });
+        break;
+      }
+      case 1: {
+        jsonList.forEach((json, idx) => {
+          const y = 50 + allSelection[idx].height() * idx;
+          json.attrs.x = 50;
+          json.attrs.y = y;
+        });
+        break;
+      }
+    }
   } else {
-    interfaceType = "changet-text";
+    if (allSelection.length > 0 && allSelection.some(node => node.x() !== allSelection[0].x())) {
+      updateInterfaceType("layout");
+      inference();
+      return;
+    }
+    updateInterfaceType("change-style");
     inference();
     return;
   }
@@ -291,14 +333,14 @@ function updateAiPreview(data: string) {
   const { x, y, width, height } = group.getClientRect();
   backRect.position({ x, y });
   backRect.size({ width, height });
-
-  aiPreviewLayer?.add(backRect);
+  aiPreviewLayer?.opacity(0.8);
   aiPreviewLayer?.add(group);
+  aiPreviewLayer?.add(backRect);
 }
 
 function clearAiPreview() {
   isAiPreviewing = false;
-  aiPreviewLayer?.removeChildren();
+  aiPreviewLayer?.destroyChildren();
   selection.nodes().forEach(node => {
     node.visible(true);
   });
@@ -346,5 +388,5 @@ export function addText() {
 export function setText(text: string) {
   const textNode = selection.nodes()[0] as Konva.Text;
   textNode.text(text);
-  interfaceType = "changet-text";
+  updateInterfaceType("changet-text");
 }
