@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import Toolbar from "./components/toolbar";
 import { initApp } from "./store";
 import { TextEdit } from "./components/text-edit";
+import Keyboard from "./components/keyboard";
 
 function App() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,6 +19,7 @@ function App() {
       <div className="w-2/3 h-2/3 bg-white" ref={containerRef}></div>
       <Toolbar />
       <TextEdit />
+      <Keyboard />
     </div>
   );
 }
