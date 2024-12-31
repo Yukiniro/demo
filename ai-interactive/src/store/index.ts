@@ -13,7 +13,7 @@ let isAiPreviewing = false;
 const textList: Record<string, string[]> = {
   "new year": ["New Year Starts!", "Joy, Hope, Love.", "Fresh Day Begins!", "Time Flies Fast!"],
   "happy birthday": ["Happy Birthday!", "Fun Times Here!", "Party Time Now!", "Cake Time Fun!"],
-  travel: ["Go Far Now!", "See New Lands!", "Travel Starts Here!", "Fun Road Ahead!"],
+  travel: ["Travel Begins!", "Explore World!", "Journey Forward!", "Wonders Await!"],
 };
 
 const styleList = [
@@ -296,7 +296,7 @@ function inference() {
       }
       case 1: {
         jsonList.forEach((json, idx) => {
-          const y = 50 + allSelection[idx].height() * idx;
+          const y = 100 + allSelection[idx].height() * idx;
           json.attrs.x = 50;
           json.attrs.y = y;
         });
