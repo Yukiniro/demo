@@ -1,0 +1,134 @@
+{
+    "background": {
+        "backgroundType": 0,
+        "colorType": 0,
+        "color1": "#ffffff",
+        "gradientColor1": "#dabc89", 
+        "gradientColor2": "#b5945e",
+        "gradientAngle": 0,
+        "gradientStart": 0,
+        "gradientEnd": 1,
+        "imageType": 0,
+        "isTransparent": true
+    },
+    "graphs": [
+        {
+            "graphType": "Text",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.09598785461499024,
+                "y": 0.596,
+                "width": 0.8080398254394531,
+                "height": 0.126
+            },
+            "fontName": "Cinzel Decorative",
+            "fontSize": 46,
+            "fontStyle": "normal",
+            "fontWeight": "bold",
+            "fontColor": "#0c0c0c",
+            "outline": false,
+            "glow": false,
+            "underline": false,
+            "textAlign": "center",
+            "text": "Company Name",
+            "lineHeight": 1,
+            "letterSpacing": 0,
+            "isUpperCase": true,
+            "shadowOffset": 5,
+            "shadowAngle": 110,
+            "shadowOpacity": 60,
+            "curve": 0,
+            "shadow": false,
+            "shadowColor": "#000000",
+            "shadowBlur": 10
+        },
+        {
+            "graphType": "Text",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.3287812500000001,
+                "y": 0.722,
+                "width": 0.3434375,
+                "height": 0.052
+            },
+            "fontName": "Cinzel Decorative",
+            "fontSize": 20,
+            "fontStyle": "normal",
+            "fontWeight": "normal",
+            "fontColor": "#0c0c0c",
+            "outline": false,
+            "glow": false,
+            "underline": false,
+            "textAlign": "center",
+            "text": "Slogan Here",
+            "lineHeight": 1,
+            "letterSpacing": 0.2,
+            "isUpperCase": true,
+            "shadowOffset": 5,
+            "shadowAngle": 110,
+            "shadowOpacity": 60,
+            "curve": 0,
+            "shadow": false,
+            "shadowColor": "#000000",
+            "shadowBlur": 10
+        },
+        {
+            "graphType": "SVGClipart",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.322,
+                "y": 0.196,
+                "width": 0.356,
+                "height": 0.364
+            },
+            "flipX": 1,
+            "flipY": 1,
+            "svgPath": "logo-template-graphic/food-drink/food-drink-0280.svg",
+            "colorDatas": [
+                {
+                    "fillType": 0,
+                    "color": "#0C0C0C",
+                    "gradient": {
+                        "color1": "#59d559",
+                        "color2": "#00924c",
+                        "angle": 270,
+                        "gradientType": 0,
+                        "gradientStart": 0,
+                        "gradientEnd": 1
+                    }
+                }
+            ]
+        },
+        {
+            "graphType": "SVGClipart",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.322,
+                "y": 0.208,
+                "width": 0.356,
+                "height": 0.364
+            },
+            "flipX": 1,
+            "flipY": 1,
+            "svgPath": "logo-template-graphic/food-drink/food-drink-0281.svg",
+            "colorDatas": [
+                {
+                    "fillType": 0,
+                    "color": "#FFFFFF",
+                    "gradient": {
+                        "color1": "#59d559",
+                        "color2": "#00924c",
+                        "angle": 270,
+                        "gradientType": 0,
+                        "gradientStart": 0,
+                        "gradientEnd": 1
+                    }
+                }
+            ]
+        }
+    ]
+}

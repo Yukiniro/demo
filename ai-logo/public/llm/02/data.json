@@ -1,0 +1,111 @@
+{
+    "pageSize": {
+        "width": 500,
+        "height": 500,
+        "unit": 0
+    },
+    "background": {
+        "backgroundType": 0,
+        "colorType": 0,
+        "color1": "#ffffff",
+        "gradientColor1": "#dabc89",
+        "gradientColor2": "#b5945e",
+        "gradientAngle": 0,
+        "gradientStart": 0,
+        "gradientEnd": 1,
+        "imageType": 0,
+        "isTransparent": true
+    },
+    "graphs": [
+        {
+            "graphType": "Text",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.09212890624999998,
+                "y": 0.603,
+                "width": 0.8157437744140624,
+                "height": 0.126
+            },
+            "fontName": "Playfair Display",
+            "fontSize": 48,
+            "fontStyle": "normal",
+            "fontWeight": "bold",
+            "fontColor": "#5f5f5f",
+            "outline": false,
+            "glow": false,
+            "underline": false,
+            "textAlign": "center",
+            "text": "Company Name",
+            "lineHeight": 1,
+            "letterSpacing": 0,
+            "isUpperCase": true,
+            "shadowOffset": 5,
+            "shadowAngle": 110,
+            "shadowOpacity": 60,
+            "curve": 0,
+            "shadow": false,
+            "shadowColor": "#000000",
+            "shadowBlur": 10
+        },
+        {
+            "graphType": "Text",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.3174998779296876,
+                "y": 0.726,
+                "width": 0.36499984741210935,
+                "height": 0.052
+            },
+            "fontName": "Playfair Display",
+            "fontSize": 20,
+            "fontStyle": "normal",
+            "fontWeight": "normal",
+            "fontColor": "#5f5f5f",
+            "outline": false,
+            "glow": false,
+            "underline": false,
+            "textAlign": "center",
+            "text": "Slogan Here",
+            "lineHeight": 1,
+            "letterSpacing": 0.1,
+            "isUpperCase": true,
+            "shadowOffset": 5,
+            "shadowAngle": 110,
+            "shadowOpacity": 60,
+            "curve": 0,
+            "shadow": false,
+            "shadowColor": "#000000",
+            "shadowBlur": 10
+        },
+        {
+            "graphType": "SVGClipart",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.296,
+                "y": 0.186,
+                "width": 0.408,
+                "height": 0.4
+            },
+            "flipX": 1,
+            "flipY": 1,
+            "svgPath": "logo-template-graphic/animal-pet/animal-pet-1158.svg",
+            "colorDatas": [
+                {
+                    "fillType": 0,
+                    "color": "#2C2C2C",
+                    "gradient": {
+                        "color1": "#59d559",
+                        "color2": "#00924c",
+                        "angle": 270,
+                        "gradientType": 0,
+                        "gradientStart": 0,
+                        "gradientEnd": 1
+                    }
+                }
+            ]
+        }
+    ]
+}

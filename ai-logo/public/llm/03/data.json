@@ -1,0 +1,139 @@
+{
+    "pageSize": {
+        "width": 500,
+        "height": 500,
+        "unit": 0
+    },
+    "background": {
+        "backgroundType": 0,
+        "colorType": 0,
+        "color1": "#ffffff",
+        "gradientColor1": "#dabc89",
+        "gradientColor2": "#b5945e",
+        "gradientAngle": 0,
+        "gradientStart": 0,
+        "gradientEnd": 1,
+        "imageType": 0,
+        "isTransparent": true
+    },
+    "graphs": [
+        {
+            "graphType": "Text",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.09371455007934545,
+                "y": 0.627,
+                "width": 0.8131597900390625,
+                "height": 0.126
+            },
+            "fontName": "Play",
+            "fontSize": 48,
+            "fontStyle": "normal",
+            "fontWeight": "bold",
+            "fontColor": "#343a40",
+            "outline": false,
+            "glow": false,
+            "underline": false,
+            "textAlign": "center",
+            "text": "Company Name",
+            "lineHeight": 1,
+            "letterSpacing": 0,
+            "isUpperCase": true,
+            "shadowOffset": 5,
+            "shadowAngle": 110,
+            "shadowOpacity": 60,
+            "curve": 0,
+            "shadow": false,
+            "shadowColor": "#000000",
+            "shadowBlur": 10
+        },
+        {
+            "graphType": "Text",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.3326478298270871,
+                "y": 0.751,
+                "width": 0.336159912109375,
+                "height": 0.054
+            },
+            "fontName": "Play",
+            "fontSize": 20,
+            "fontStyle": "normal",
+            "fontWeight": "normal",
+            "fontColor": "#343a40",
+            "outline": false,
+            "glow": false,
+            "underline": false,
+            "textAlign": "center",
+            "text": "Slogan Here",
+            "lineHeight": 1,
+            "letterSpacing": 0.2,
+            "isUpperCase": true,
+            "shadowOffset": 5,
+            "shadowAngle": 110,
+            "shadowOpacity": 60,
+            "curve": 0,
+            "shadow": false,
+            "shadowColor": "#000000",
+            "shadowBlur": 10
+        },
+        {
+            "graphType": "SVGClipart",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.32,
+                "y": 0.20099999999999996,
+                "width": 0.36,
+                "height": 0.36
+            },
+            "flipX": 1,
+            "flipY": 1,
+            "svgPath": "logo-template-graphic/food-drink/food-drink-0277.svg",
+            "colorDatas": [
+                {
+                    "fillType": 0,
+                    "color": "#343A40",
+                    "gradient": {
+                        "color1": "#59d559",
+                        "color2": "#00924c",
+                        "angle": 270,
+                        "gradientType": 0,
+                        "gradientStart": 0,
+                        "gradientEnd": 1
+                    }
+                }
+            ]
+        },
+        {
+            "graphType": "SVGClipart",
+            "angle": 0,
+            "opacity": 1,
+            "relativeRect": {
+                "x": 0.338,
+                "y": 0.255,
+                "width": 0.326,
+                "height": 0.258
+            },
+            "flipX": 1,
+            "flipY": 1,
+            "svgPath": "logo-template-graphic/food-drink/food-drink-0276.svg",
+            "colorDatas": [
+                {
+                    "fillType": 0,
+                    "color": "#343A40",
+                    "gradient": {
+                        "color1": "#59d559",
+                        "color2": "#00924c",
+                        "angle": 270,
+                        "gradientType": 0,
+                        "gradientStart": 0,
+                        "gradientEnd": 1
+                    }
+                }
+            ]
+        }
+    ]
+}
