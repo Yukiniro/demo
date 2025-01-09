@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@juliangarnierorg/anime-beta':
-        specifier: 4.0.0-beta.105
-        version: 4.0.0-beta.105
+        specifier: 4.0.0-rc.2
+        version: 4.0.0-rc.2
       daisyui:
         specifier: ^4.4.6
         version: 4.4.6(postcss@8.4.31)
@@ -269,8 +269,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.20':
     resolution: {integrity: sha512-R8LcPeWZol2zR8mmH3JeKQ6QRCFb7XgUhV9ZlGhHLGyg4wpPiPZNQOOWhFZhxKw8u//yTbNGI42Bx/3paXEQ+Q==}
 
-  '@juliangarnierorg/anime-beta@4.0.0-beta.105':
-    resolution: {integrity: sha512-kWeLErG/qkfjiY+RM3y6h1yFd4aGyql6yVEcRLEoCoGj6bNJS6qFoaXNQ2W710PLmUutMlll+3JOmIjhGkp8Dg==, tarball: https://npm.pkg.github.com/download/@juliangarnierorg/anime-beta/4.0.0-beta.105/a57330e91614183b9191e99daafa95b0a4348c11}
+  '@juliangarnierorg/anime-beta@4.0.0-rc.2':
+    resolution: {integrity: sha512-+BouuNQ6KLxYScnnoSsHecwjl+67+M5ncS8KbbGFHNJrALn2VeQqpbbcRF2iHQpYXeM5qCjehGtmWo6egxjd1w==, tarball: https://npm.pkg.github.com/download/@juliangarnierorg/anime-beta/4.0.0-rc.2/3244d17b2c35e13506561fd6237df7f5954f9e57}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2028,7 +2028,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@juliangarnierorg/anime-beta@4.0.0-beta.105': {}
+  '@juliangarnierorg/anime-beta@4.0.0-rc.2': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:

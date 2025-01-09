@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@juliangarnierorg/anime-beta": "4.0.0-beta.105",
+    "@juliangarnierorg/anime-beta": "4.0.0-rc.2",
     "daisyui": "^4.4.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
