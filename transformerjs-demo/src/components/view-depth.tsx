@@ -14,7 +14,7 @@ export default function ViewRMBG() {
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
-    worker.current = new Worker(new URL("../worker/rmbg.ts", import.meta.url), {
+    worker.current = new Worker(new URL("../worker/depth.ts", import.meta.url), {
       type: "module",
     });
     return () => worker.current?.terminate();
@@ -40,7 +40,7 @@ export default function ViewRMBG() {
     setPending(false);
   };
 
-  const removeBG = async () => {
+  const generateDepth = async () => {
     setPending(true);
     const timestamp = performance.now();
     const url = await new Promise(resolve => {
@@ -106,8 +106,8 @@ export default function ViewRMBG() {
         </Button>
       )}
       {isModelReady && (
-        <Button disabled={pending} onClick={removeBG} className="w-32">
-          移除背景
+        <Button disabled={pending} onClick={generateDepth} className="w-32">
+          生成深度图
         </Button>
       )}
       <p className="text-muted-foreground">加载模型时间: {prepareModelTimeText}s</p>

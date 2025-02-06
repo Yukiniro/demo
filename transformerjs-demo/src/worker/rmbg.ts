@@ -39,7 +39,7 @@ self.addEventListener("message", async event => {
         self.postMessage({ type: "done" });
         break;
       }
-      case "removeBG": {
+      case "run": {
         if (!model || !processor) {
           throw new Error("Model or processor not prepared");
         }
@@ -64,7 +64,7 @@ self.addEventListener("message", async event => {
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        self.postMessage({ type: "removeBG", data: bitmap }, [bitmap]);
+        self.postMessage({ type: "success", data: bitmap }, [bitmap]);
         break;
       }
     }
