@@ -1,17 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import InputFile from "@/components/input-file";
+import ModelControls from "@/components/model-controls";
+import useModelState from "@/hooks/useModelState";
 
 export default function ViewRMBG() {
   const worker = useRef<Worker | null>(null);
 
-  const [prepareModelTime, setPrepareModelTime] = useState(0);
-  const [pendingTime, setPendingTime] = useState(0);
-  const [isModelReady, setIsModelReady] = useState(false);
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
-  const [pending, setPending] = useState(false);
+  const [state, actions] = useModelState();
+  const { prepareModelTime, pendingTime, isModelReady, input, output, pending } = state;
+  const { setPrepareModelTime, setPendingTime, setIsModelReady, setInput, setOutput, setPending } = actions;
 
   useEffect(() => {
     worker.current = new Worker(new URL("../worker/rmbg.ts", import.meta.url), {
@@ -75,9 +73,6 @@ export default function ViewRMBG() {
     }
   };
 
-  const prepareModelTimeText = prepareModelTime === 0 ? "NaN" : (prepareModelTime / 1e3).toFixed(2);
-  const pendingTimeText = pendingTime === 0 ? "NaN" : (pendingTime / 1e3).toFixed(2);
-
   return (
     <>
       <Card className="w-full max-w-6xl">
@@ -100,18 +95,14 @@ export default function ViewRMBG() {
           </div>
         </CardContent>
       </Card>
-      {!isModelReady && (
-        <Button disabled={pending} onClick={prepareModel} className="w-32">
-          准备模型
-        </Button>
-      )}
-      {isModelReady && (
-        <Button disabled={pending} onClick={removeBG} className="w-32">
-          移除背景
-        </Button>
-      )}
-      <p className="text-muted-foreground">加载模型时间: {prepareModelTimeText}s</p>
-      <p className="text-muted-foreground">处理时间: {pendingTimeText}s</p>
+      <ModelControls
+        isModelReady={isModelReady}
+        pending={pending}
+        prepareModelTime={prepareModelTime}
+        pendingTime={pendingTime}
+        onPrepareModel={prepareModel}
+        onGenerate={removeBG}
+      />
     </>
   );
 }

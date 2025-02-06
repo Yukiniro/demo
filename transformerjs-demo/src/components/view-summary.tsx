@@ -1,19 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "./ui/textarea";
+import ModelControls from "./model-controls";
+import useModelState from "@/hooks/useModelState";
 
 const text = `Naruto[a] is a Japanese manga series written and illustrated by Masashi Kishimoto. It tells the story of Naruto Uzumaki, a young ninja who seeks recognition from his peers and dreams of becoming the Hokage, the leader of his village. The story is told in two parts: the first is set in Naruto's pre-teen years (volumes 1–27), and the second in his teens (volumes 28–72). The series is based on two one-shot manga by Kishimoto: Karakuri (1995), which earned Kishimoto an honorable mention in Shueisha's monthly Hop Step Award the following year, and Naruto (1997).`;
 
 export default function ViewSummary() {
   const worker = useRef<Worker | null>(null);
 
-  const [prepareModelTime, setPrepareModelTime] = useState(0);
-  const [pendingTime, setPendingTime] = useState(0);
-  const [isModelReady, setIsModelReady] = useState(false);
-  const [input, setInput] = useState(text);
-  const [output, setOutput] = useState("");
-  const [pending, setPending] = useState(false);
+  const [state, actions] = useModelState(text);
+  const { prepareModelTime, pendingTime, isModelReady, input, output, pending } = state;
+  const { setPrepareModelTime, setPendingTime, setIsModelReady, setInput, setOutput, setPending } = actions;
+
 
   useEffect(() => {
     worker.current = new Worker(new URL("../worker/summary.ts", import.meta.url), {
@@ -62,9 +61,6 @@ export default function ViewSummary() {
     setPending(false);
   };
 
-  const prepareModelTimeText = prepareModelTime === 0 ? "NaN" : (prepareModelTime / 1e3).toFixed(2);
-  const pendingTimeText = pendingTime === 0 ? "NaN" : (pendingTime / 1e3).toFixed(2);
-
   return (
     <>
       <Card className="w-full max-w-6xl">
@@ -79,18 +75,14 @@ export default function ViewSummary() {
           </div>
         </CardContent>
       </Card>
-      {!isModelReady && (
-        <Button disabled={pending} onClick={prepareModel} className="w-32">
-          准备模型
-        </Button>
-      )}
-      {isModelReady && (
-        <Button disabled={pending} onClick={generateSummary} className="w-32">
-          生成摘要
-        </Button>
-      )}
-      <p className="text-muted-foreground">加载模型时间: {prepareModelTimeText}s</p>
-      <p className="text-muted-foreground">处理时间: {pendingTimeText}s</p>
+      <ModelControls
+        isModelReady={isModelReady}
+        pending={pending}
+        prepareModelTime={prepareModelTime}
+        pendingTime={pendingTime}
+        onPrepareModel={prepareModel}
+        onGenerate={generateSummary}
+      />
     </>
   );
 }
