@@ -81,7 +81,7 @@ export default function ViewRMBG() {
   return (
     <>
       <Card className="w-full max-w-6xl">
-        <CardContent className="space-y-4 pt-6">
+        <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="w-full h-96 aspect-auto bg-muted rounded-lg border-2 border-dashed border-muted-foreground flex items-center justify-center">
               {input ? (
