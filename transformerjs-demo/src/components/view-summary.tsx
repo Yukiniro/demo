@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import InputFile from "@/components/input-file";
+import { Textarea } from "./ui/textarea";
 
-export default function ViewRMBG() {
+const text = `Naruto[a] is a Japanese manga series written and illustrated by Masashi Kishimoto. It tells the story of Naruto Uzumaki, a young ninja who seeks recognition from his peers and dreams of becoming the Hokage, the leader of his village. The story is told in two parts: the first is set in Naruto's pre-teen years (volumes 1–27), and the second in his teens (volumes 28–72). The series is based on two one-shot manga by Kishimoto: Karakuri (1995), which earned Kishimoto an honorable mention in Shueisha's monthly Hop Step Award the following year, and Naruto (1997).`;
+
+export default function ViewSummary() {
   const worker = useRef<Worker | null>(null);
 
   const [prepareModelTime, setPrepareModelTime] = useState(0);
   const [pendingTime, setPendingTime] = useState(0);
   const [isModelReady, setIsModelReady] = useState(false);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(text);
   const [output, setOutput] = useState("");
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
-    worker.current = new Worker(new URL("../worker/rmbg.ts", import.meta.url), {
+    worker.current = new Worker(new URL("../worker/summary.ts", import.meta.url), {
       type: "module",
     });
     return () => worker.current?.terminate();
@@ -40,39 +42,24 @@ export default function ViewRMBG() {
     setPending(false);
   };
 
-  const removeBG = async () => {
+  const generateSummary = async () => {
     setPending(true);
     const timestamp = performance.now();
-    const url = await new Promise(resolve => {
+    const summary = await new Promise(resolve => {
       worker.current?.addEventListener("message", e => {
         switch (e.data.type) {
           case "success":
-            {
-              const bitmap = e.data.data;
-              const canvas = document.createElement("canvas");
-              canvas.width = bitmap.width;
-              canvas.height = bitmap.height;
-              canvas.getContext("2d")?.drawImage(bitmap, 0, 0);
-              const url = canvas.toDataURL();
-              resolve(url);
-            }
+            resolve(e.data.data);
             break;
           default:
             break;
         }
       });
-      worker.current?.postMessage({ type: "run", url: input });
+      worker.current?.postMessage({ type: "run", text: input });
     });
     setPendingTime(performance.now() - timestamp);
-    setOutput(url as string);
+    setOutput(summary as string);
     setPending(false);
-  };
-
-  const handleInputFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setInput(URL.createObjectURL(file));
-    }
   };
 
   const prepareModelTimeText = prepareModelTime === 0 ? "NaN" : (prepareModelTime / 1e3).toFixed(2);
@@ -84,18 +71,10 @@ export default function ViewRMBG() {
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="w-full h-96 aspect-auto bg-muted rounded-lg border-2 border-dashed border-muted-foreground flex items-center justify-center">
-              {input ? (
-                <img src={input} alt="Original" className="max-w-full max-h-full object-contain" />
-              ) : (
-                <InputFile onChange={handleInputFileChange} />
-              )}
+              <Textarea className="w-full h-full" value={input} onChange={e => setInput(e.target.value)} />
             </div>
             <div className="w-full h-96 aspect-auto bg-muted rounded-lg border-2 border-dashed border-muted-foreground flex items-center justify-center">
-              {output ? (
-                <img src={output} alt="Processed" className="max-w-full max-h-full object-contain" />
-              ) : (
-                <p className="text-muted-foreground">处理后的图片将显示在这里</p>
-              )}
+              <Textarea className="w-full h-full" value={output} readOnly />
             </div>
           </div>
         </CardContent>
@@ -106,8 +85,8 @@ export default function ViewRMBG() {
         </Button>
       )}
       {isModelReady && (
-        <Button disabled={pending} onClick={removeBG} className="w-32">
-          移除背景
+        <Button disabled={pending} onClick={generateSummary} className="w-32">
+          生成摘要
         </Button>
       )}
       <p className="text-muted-foreground">加载模型时间: {prepareModelTimeText}s</p>

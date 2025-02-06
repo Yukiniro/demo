@@ -1,10 +1,11 @@
 import ViewRMBG from "@/components/view-rmbg";
 import ViewDepth from "@/components/view-depth";
+import ViewSummary from "@/components/view-summary";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 
 function App() {
-  const [viewType, setViewType] = useState<"rmbg" | "depth">("rmbg");
+  const [viewType, setViewType] = useState<"rmbg" | "depth" | "summary">("rmbg");
   const views = {
     rmbg: {
       View: ViewRMBG,
@@ -14,6 +15,10 @@ function App() {
       View: ViewDepth,
       text: "生成深度图",
     },
+    summary: {
+      View: ViewSummary,
+      text: "生成摘要",
+    },
   };
   const View = views[viewType].View;
   return (
@@ -21,7 +26,7 @@ function App() {
       <div className="flex flex-col items-center justify-center min-h-screen py-12 space-y-6">
         <div className="space-y-6 text-center fixed top-12 left-0 w-full flex flex-col items-center justify-center">
           <h1 className="text-4xl font-bold tracking-tight">Transformers.js</h1>
-          <Select value={viewType} onValueChange={value => setViewType(value as "rmbg" | "depth")}>
+          <Select value={viewType} onValueChange={value => setViewType(value as "rmbg" | "depth" | "summary")}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="选择功能" />
             </SelectTrigger>

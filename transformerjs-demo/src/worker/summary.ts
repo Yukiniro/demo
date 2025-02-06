@@ -6,9 +6,8 @@ self.addEventListener("message", async event => {
   try {
     switch (event.data.type) {
       case "prepareModel": {
-        processor = await pipeline("depth-estimation", "onnx-community/depth-anything-v2-small", {
+        processor = await pipeline("summarization", "Falconsai/text_summarization", {
           device: "webgpu",
-          dtype: "fp16",
         });
         self.postMessage({ type: "done" });
         break;
@@ -17,16 +16,16 @@ self.addEventListener("message", async event => {
         if (!processor) {
           throw new Error("Model or processor not prepared");
         }
-        const url = event.data.url;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        const { depth } = await processor(url);
-        const canvas = depth.toCanvas();
-        const bitmap = await createImageBitmap(canvas);
+        const text = event.data.text;
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        self.postMessage({ type: "success", data: bitmap }, [bitmap]);
+        const output = await processor(text, {
+          max_new_tokens: 100,
+        });
+        const summary = output.map((o: { summary_text: string }) => o.summary_text).join("\n");
+
+        self.postMessage({ type: "success", data: summary });
         break;
       }
     }
