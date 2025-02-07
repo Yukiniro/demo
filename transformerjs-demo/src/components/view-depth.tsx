@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import InputFile from "@/components/input-file";
 import ModelControls from "@/components/model-controls";
-import useModelState from "@/hooks/useModelState";
+import useModelState from "@/hooks/use-model-state";
 import useModelWorker from "@/hooks/use-model-worker";
 
 export default function ViewRMBG({ device }: { device: "webgpu" | "wasm" }) {
