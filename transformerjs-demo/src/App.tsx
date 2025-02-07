@@ -3,6 +3,7 @@ import ViewDepth from "@/components/view-depth";
 import ViewSummary from "@/components/view-summary";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { Toaster } from "@/components/ui/toaster";
 
 function App() {
   const [viewType, setViewType] = useState<"rmbg" | "depth" | "summary">("rmbg");
@@ -41,6 +42,7 @@ function App() {
         </div>
         {View && <View />}
       </div>
+      <Toaster />
     </>
   );
 }

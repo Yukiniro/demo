@@ -1,22 +1,13 @@
-import { useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import InputFile from "@/components/input-file";
 import ModelControls from "@/components/model-controls";
 import useModelState from "@/hooks/useModelState";
-
+import useModelWorker from "@/hooks/use-model-worker";
 export default function ViewRMBG() {
-  const worker = useRef<Worker | null>(null);
-
   const [state, actions] = useModelState();
   const { prepareModelTime, pendingTime, isModelReady, input, output, pending } = state;
   const { setPrepareModelTime, setPendingTime, setIsModelReady, setInput, setOutput, setPending } = actions;
-
-  useEffect(() => {
-    worker.current = new Worker(new URL("../worker/rmbg.ts", import.meta.url), {
-      type: "module",
-    });
-    return () => worker.current?.terminate();
-  }, []);
+  const worker = useModelWorker("../worker/rmbg.ts");
 
   const prepareModel = async () => {
     setPending(true);

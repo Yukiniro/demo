@@ -30,6 +30,6 @@ self.addEventListener("message", async event => {
       }
     }
   } catch (error) {
-    console.error(error);
+    self.postMessage({ type: "error", data: (error as Error).message });
   }
 });
