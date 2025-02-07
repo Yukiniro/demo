@@ -8,19 +8,25 @@ import { Toaster } from "@/components/ui/toaster";
 function App() {
   const [viewType, setViewType] = useState<"rmbg" | "depth" | "summary">("rmbg");
   const [device, setDevice] = useState<"webgpu" | "wasm">("webgpu");
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  const disableWebGPU = !navigator.gpu;
   const views = {
     rmbg: {
       View: ViewRMBG,
       text: "移除背景",
+      disableWebGPU,
     },
     depth: {
       View: ViewDepth,
       text: "生成深度图",
+      disableWebGPU,
     },
     summary: {
       View: ViewSummary,
       text: "生成摘要",
-      disableWASM: true,
+      disableWebGPU,
     },
   };
   const View = views[viewType].View;

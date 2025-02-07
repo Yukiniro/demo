@@ -10,7 +10,7 @@ self.addEventListener("message", async event => {
         const options: {
           device: "webgpu" | "wasm";
           dtype?: "fp32" | "q8";
-        } = device === "webgpu" ? { device: "webgpu", dtype: "fp32" } : { device: "wasm", dtype: "q8" };
+        } = device === "webgpu" ? { device: "webgpu", dtype: "fp32" } : { device: "wasm", dtype: "fp32" };
         processor = await pipeline("summarization", "Falconsai/text_summarization", options);
         self.postMessage({ type: "done" });
         break;
