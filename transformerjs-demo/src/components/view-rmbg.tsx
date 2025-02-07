@@ -3,7 +3,7 @@ import InputFile from "@/components/input-file";
 import ModelControls from "@/components/model-controls";
 import useModelState from "@/hooks/useModelState";
 import useModelWorker from "@/hooks/use-model-worker";
-export default function ViewRMBG() {
+export default function ViewRMBG({ device }: { device: "webgpu" | "wasm" }) {
   const [state, actions] = useModelState();
   const { prepareModelTime, pendingTime, isModelReady, input, output, pending } = state;
   const { setPrepareModelTime, setPendingTime, setIsModelReady, setInput, setOutput, setPending } = actions;
@@ -17,12 +17,10 @@ export default function ViewRMBG() {
         if (e.data.type === "done") {
           worker.current?.removeEventListener("message", fn);
           resolve(e.data);
-        } else if (e.data.type === "progress") {
-          console.log("progress", e.data.data);
         }
       };
       worker.current?.addEventListener("message", fn);
-      worker.current?.postMessage({ type: "prepareModel" });
+      worker.current?.postMessage({ type: "prepareModel", device });
     });
     setPrepareModelTime(performance.now() - timestamp);
     setIsModelReady(true);

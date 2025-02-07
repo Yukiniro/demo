@@ -6,10 +6,12 @@ self.addEventListener("message", async event => {
   try {
     switch (event.data.type) {
       case "prepareModel": {
-        processor = await pipeline("depth-estimation", "onnx-community/depth-anything-v2-small", {
-          device: "webgpu",
-          dtype: "fp16",
-        });
+        const device = event.data.device;
+        const options: {
+          device: "webgpu" | "wasm";
+          dtype: "fp16" | "q8";
+        } = device === "webgpu" ? { device: "webgpu", dtype: "fp16" } : { device: "wasm", dtype: "q8" };
+        processor = await pipeline("depth-estimation", "onnx-community/depth-anything-v2-small", options);
         self.postMessage({ type: "done" });
         break;
       }

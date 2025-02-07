@@ -10,6 +10,7 @@ export default function useModelWorker(workerUrl: string) {
     });
     worker.current?.addEventListener("message", e => {
       if (e.data.type === "error") {
+        console.error(e.data.data);
         toast({
           title: "Error",
           description: e.data.data,

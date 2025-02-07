@@ -7,11 +7,13 @@ self.addEventListener("message", async event => {
   try {
     switch (event.data.type) {
       case "prepareModel": {
+        const device = event.data.device;
+        const options: {
+          device: "webgpu" | "wasm";
+          dtype: "fp16" | "q8";
+        } = device === "webgpu" ? { device: "webgpu", dtype: "fp16" } : { device: "wasm", dtype: "q8" };
         model = await AutoModel.from_pretrained("briaai/RMBG-1.4", {
-          // Do not require config.json to be present in the repository
-          // dtype: "q8",
-          device: "webgpu",
-          dtype: "fp16",
+          ...options,
           progress_callback: value => {
             switch (value.status) {
               case "progress": {

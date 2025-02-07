@@ -6,9 +6,12 @@ self.addEventListener("message", async event => {
   try {
     switch (event.data.type) {
       case "prepareModel": {
-        processor = await pipeline("summarization", "Falconsai/text_summarization", {
-          device: "webgpu",
-        });
+        const device = event.data.device;
+        const options: {
+          device: "webgpu" | "wasm";
+          dtype?: "fp32" | "q8";
+        } = device === "webgpu" ? { device: "webgpu", dtype: "fp32" } : { device: "wasm", dtype: "q8" };
+        processor = await pipeline("summarization", "Falconsai/text_summarization", options);
         self.postMessage({ type: "done" });
         break;
       }
