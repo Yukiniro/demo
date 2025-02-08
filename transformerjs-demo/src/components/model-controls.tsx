@@ -5,6 +5,7 @@ interface ModelControlsProps {
   pending: boolean;
   prepareModelTime: number;
   pendingTime: number;
+  hideButton?: boolean;
   onPrepareModel: () => void;
   onGenerate: () => void;
 }
@@ -14,6 +15,7 @@ export default function ModelControls({
   pending,
   prepareModelTime,
   pendingTime,
+  hideButton,
   onPrepareModel,
   onGenerate,
 }: ModelControlsProps) {
@@ -22,12 +24,12 @@ export default function ModelControls({
 
   return (
     <div className="space-y-2">
-      {!isModelReady && (
+      {!isModelReady && !hideButton && (
         <Button disabled={pending} onClick={onPrepareModel} className="w-32">
           准备模型
         </Button>
       )}
-      {isModelReady && (
+      {isModelReady && !hideButton && (
         <Button disabled={pending} onClick={onGenerate} className="w-32">
           推理
         </Button>

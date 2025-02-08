@@ -4,9 +4,10 @@ import ViewSummary from "@/components/view-summary";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
+import ViewSAM from "./components/view-sam";
 
 function App() {
-  const [viewType, setViewType] = useState<"rmbg" | "depth" | "summary">("rmbg");
+  const [viewType, setViewType] = useState<"rmbg" | "depth" | "summary" | "sam">("rmbg");
   const [device, setDevice] = useState<"webgpu" | "wasm">("webgpu");
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -28,6 +29,11 @@ function App() {
       text: "生成摘要",
       disableWebGPU,
     },
+    sam: {
+      View: ViewSAM,
+      text: "物体移除",
+      disableWebGPU,
+    },
   };
   const View = views[viewType].View;
 
@@ -39,7 +45,7 @@ function App() {
   // @ts-expect-error
   const disableWASM = !!views[viewType].disableWASM;
 
-  const handleViewChange = (value: "rmbg" | "depth" | "summary") => {
+  const handleViewChange = (value: "rmbg" | "depth" | "summary" | "sam") => {
     setViewType(value);
     setDevice("webgpu");
   };
