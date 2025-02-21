@@ -78,18 +78,29 @@ function App() {
     }
 
     let startTime = 0;
+    let preIndex = -1;
 
     const renderFrame = (timestamp: number) => {
       startTime = startTime || timestamp;
       const time = timestamp - startTime;
       const frameIndex = Math.floor(time / 100) % frames.length;
+
+      if (frameIndex === preIndex) {
+        requestAnimationFrame(renderFrame);
+        return;
+      }
+
+      preIndex = frameIndex;
+
       const frame = frames[frameIndex];
       const ctx = canvas!.getContext("2d");
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      if (frame.disposalType === 2) {
+      if (frameIndex === 0 || frames[frameIndex - 1].disposalType === 2) {
         ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
       }
+
       ctx!.drawImage(frame, 0, 0);
       requestAnimationFrame(renderFrame);
     };
