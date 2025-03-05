@@ -64,7 +64,8 @@ function App() {
     const images: ImageData[] = [];
 
     const canvas = document.createElement("canvas");
-    const preFrameTime = 1 / 10;
+    const fps = 10;
+    const preFrameTime = 1000 / fps;
     const start = 2;
     const end = 6;
     let curTime = start;
@@ -82,28 +83,26 @@ function App() {
       canvas.width = video.videoWidth / 4;
       canvas.height = video.videoHeight / 4;
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      curTime += preFrameTime;
+      curTime += preFrameTime / 1000;
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       images.push(imageData);
     }
 
     const gif = new AnimatedGIF({
-      // ...defaultOptions,
       gifWidth: video.videoWidth / 4,
       gifHeight: video.videoHeight / 4,
-      images: images,
+      // images: images,
       numWorkers: 4,
-      frameDuration: 1,
-      numFrames: images.length,
-      sampleInterval: 100,
-      progressCallback: () => {
-        console.log("progressCallback");
-      },
+      frameDuration: preFrameTime / 100, // 10 = 1s
+      sampleInterval: 10,
+      // progressCallback: () => {
+      //   console.log("progressCallback");
+      // },
     });
 
     images.forEach(imageData => {
       gif.addFrameImageData(imageData, {
-        delay: Math.round(preFrameTime * 10),
+        delay: Math.round(preFrameTime) / 100,
       });
     });
 
