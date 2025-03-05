@@ -23,9 +23,6 @@ importers:
       gifenc:
         specifier: ^1.0.3
         version: 1.0.3
-      gifshot:
-        specifier: ^0.4.5
-        version: 0.4.5
       lucide-react:
         specifier: ^0.401.0
         version: 0.401.0(react@18.3.1)
@@ -877,9 +874,6 @@ packages:
 
   gifenc@1.0.3:
     resolution: {integrity: sha512-xdr6AdrfGBcfzncONUOlXMBuc5wJDtOueE3c5rdG0oNgtINLD+f2iFZltrBRZYzACRbKr+mSVU/x98zv2u3jmw==}
-
-  gifshot@0.4.5:
-    resolution: {integrity: sha512-oaOTT7patjxFFv7ptR0R0NNhqy3ZAmcLUQCjM/sTsvsQaUAlB2fHirLajcNAKJ6ufoVhdP+ZkXYvmUycHP1FNg==}
 
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
@@ -2123,8 +2117,6 @@ snapshots:
   function-bind@1.1.2: {}
 
   gifenc@1.0.3: {}
-
-  gifshot@0.4.5: {}
 
   glob-parent@5.1.2:
     dependencies:

@@ -1,7 +1,7 @@
-var utils = {
+const utils = {
   URL: window.URL || window.webkitURL || window.mozURL || window.msURL,
-  getUserMedia: (function () {
-    var getUserMedia =
+  getUserMedia: (() => {
+    const getUserMedia =
       navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
     return getUserMedia ? getUserMedia.bind(navigator) : getUserMedia;
@@ -12,7 +12,7 @@ var utils = {
     window.mozRequestAnimationFrame ||
     window.oRequestAnimationFrame ||
     window.msRequestAnimationFrame,
-  requestTimeout: function requestTimeout(callback, delay) {
+  requestTimeout: (callback, delay) => {
     callback = callback || utils.noop;
     delay = delay || 0;
 
@@ -20,13 +20,13 @@ var utils = {
       return setTimeout(callback, delay);
     }
 
-    var start = new Date().getTime();
-    var handle = new Object();
-    var requestAnimFrame = utils.requestAnimFrame;
+    const start = new Date().getTime();
+    const handle = new Object();
+    const requestAnimFrame = utils.requestAnimFrame;
 
-    var loop = function loop() {
-      var current = new Date().getTime();
-      var delta = current - start;
+    const loop = () => {
+      const current = new Date().getTime();
+      const delta = current - start;
 
       delta >= delay ? callback.call() : (handle.value = requestAnimFrame(loop));
     };
@@ -36,21 +36,21 @@ var utils = {
     return handle;
   },
   Blob: window.Blob || window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder,
-  btoa: (function () {
-    var btoa =
+  btoa: (() => {
+    const btoa =
       window.btoa ||
       function (input) {
-        var output = "";
-        var i = 0;
-        var l = input.length;
-        var key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-        var chr1 = void 0;
-        var chr2 = void 0;
-        var chr3 = void 0;
-        var enc1 = void 0;
-        var enc2 = void 0;
-        var enc3 = void 0;
-        var enc4 = void 0;
+        let output = "";
+        let i = 0;
+        const l = input.length;
+        const key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        let chr1;
+        let chr2;
+        let chr3;
+        let enc1;
+        let enc2;
+        let enc3;
+        let enc4;
 
         while (i < l) {
           chr1 = input.charCodeAt(i++);
@@ -75,45 +75,45 @@ var utils = {
 
     return btoa ? btoa.bind(window) : utils.noop;
   })(),
-  isObject: function isObject(obj) {
+  isObject: obj => {
     return obj && Object.prototype.toString.call(obj) === "[object Object]";
   },
-  isEmptyObject: function isEmptyObject(obj) {
+  isEmptyObject: obj => {
     return utils.isObject(obj) && !Object.keys(obj).length;
   },
-  isArray: function isArray(arr) {
+  isArray: arr => {
     return arr && Array.isArray(arr);
   },
-  isFunction: function isFunction(func) {
+  isFunction: func => {
     return func && typeof func === "function";
   },
-  isElement: function isElement(elem) {
+  isElement: elem => {
     return elem && elem.nodeType === 1;
   },
-  isString: function isString(value) {
+  isString: value => {
     return typeof value === "string" || Object.prototype.toString.call(value) === "[object String]";
   },
   isSupported: {
-    canvas: function canvas() {
-      var el = document.createElement("canvas");
+    canvas: () => {
+      const el = document.createElement("canvas");
 
       return el && el.getContext && el.getContext("2d");
     },
-    webworkers: function webworkers() {
+    webworkers: () => {
       return window.Worker;
     },
-    blob: function blob() {
+    blob: () => {
       return utils.Blob;
     },
-    Uint8Array: function Uint8Array() {
+    Uint8Array: () => {
       return window.Uint8Array;
     },
-    Uint32Array: function Uint32Array() {
+    Uint32Array: () => {
       return window.Uint32Array;
     },
-    videoCodecs: (function () {
-      var testEl = document.createElement("video");
-      var supportObj = {
+    videoCodecs: (() => {
+      const testEl = document.createElement("video");
+      const supportObj = {
         mp4: false,
         h264: false,
         ogv: false,
@@ -145,10 +145,10 @@ var utils = {
       return supportObj;
     })(),
   },
-  noop: function noop() {},
-  each: function each(collection, callback) {
-    var x = void 0;
-    var len = void 0;
+  noop: () => {},
+  each: (collection, callback) => {
+    let x;
+    let len;
 
     if (utils.isArray(collection)) {
       x = -1;
@@ -169,19 +169,19 @@ var utils = {
       }
     }
   },
-  mergeOptions: function mergeOptions(defaultOptions, userOptions) {
+  mergeOptions: (defaultOptions, userOptions) => {
     if (!utils.isObject(defaultOptions) || !utils.isObject(userOptions) || !Object.keys) {
       return;
     }
 
-    var newObj = {};
+    const newObj = {};
 
-    utils.each(defaultOptions, function (key, val) {
+    utils.each(defaultOptions, (key, val) => {
       newObj[key] = defaultOptions[key];
     });
 
-    utils.each(userOptions, function (key, val) {
-      var currentUserOption = userOptions[key];
+    utils.each(userOptions, (key, val) => {
+      const currentUserOption = userOptions[key];
 
       if (!utils.isObject(currentUserOption)) {
         newObj[key] = currentUserOption;
@@ -196,7 +196,7 @@ var utils = {
 
     return newObj;
   },
-  setCSSAttr: function setCSSAttr(elem, attr, val) {
+  setCSSAttr: (elem, attr, val) => {
     if (!utils.isElement(elem)) {
       return;
     }
@@ -204,12 +204,12 @@ var utils = {
     if (utils.isString(attr) && utils.isString(val)) {
       elem.style[attr] = val;
     } else if (utils.isObject(attr)) {
-      utils.each(attr, function (key, val) {
+      utils.each(attr, (key, val) => {
         elem.style[key] = val;
       });
     }
   },
-  removeElement: function removeElement(node) {
+  removeElement: node => {
     if (!utils.isElement(node)) {
       return;
     }
@@ -217,17 +217,17 @@ var utils = {
       node.parentNode.removeChild(node);
     }
   },
-  createWebWorker: function createWebWorker(content) {
+  createWebWorker: content => {
     if (!utils.isString(content)) {
       return {};
     }
 
     try {
-      var blob = new utils.Blob([content], {
+      const blob = new utils.Blob([content], {
         type: "text/javascript",
       });
-      var objectUrl = utils.URL.createObjectURL(blob);
-      var worker = new Worker(objectUrl);
+      const objectUrl = utils.URL.createObjectURL(blob);
+      const worker = new Worker(objectUrl);
 
       return {
         objectUrl: objectUrl,
@@ -237,22 +237,20 @@ var utils = {
       return "" + e;
     }
   },
-  getExtension: function getExtension(src) {
+  getExtension: src => {
     return src.substr(src.lastIndexOf(".") + 1, src.length);
   },
-  getFontSize: function getFontSize() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
+  getFontSize: (options = {}) => {
     if (!document.body || options.resizeFont === false) {
       return options.fontSize;
     }
 
-    var text = options.text;
-    var containerWidth = options.gifWidth;
-    var fontSize = parseInt(options.fontSize, 10);
-    var minFontSize = parseInt(options.minFontSize, 10);
-    var div = document.createElement("div");
-    var span = document.createElement("span");
+    const text = options.text;
+    const containerWidth = options.gifWidth;
+    let fontSize = parseInt(options.fontSize, 10);
+    const minFontSize = parseInt(options.minFontSize, 10);
+    const div = document.createElement("div");
+    const span = document.createElement("span");
 
     div.setAttribute("width", containerWidth);
     div.appendChild(span);
@@ -276,14 +274,14 @@ var utils = {
 };
 
 // Dependencies
-var error = {
-  validate: function validate(skipObj) {
+const error = {
+  validate: skipObj => {
     skipObj = utils.isObject(skipObj) ? skipObj : {};
 
-    var errorObj = {};
+    let errorObj = {};
 
-    utils.each(error.validators, function (indece, currentValidator) {
-      var errorCode = currentValidator.errorCode;
+    utils.each(error.validators, (indece, currentValidator) => {
+      const errorCode = currentValidator.errorCode;
 
       if (!skipObj[errorCode] && !currentValidator.condition) {
         errorObj = currentValidator;
@@ -297,9 +295,9 @@ var error = {
 
     return errorObj;
   },
-  isValid: function isValid(skipObj) {
-    var errorObj = error.validate(skipObj);
-    var isValid = errorObj.error !== true ? true : false;
+  isValid: skipObj => {
+    const errorObj = error.validate(skipObj);
+    const isValid = errorObj.error !== true ? true : false;
 
     return isValid;
   },
@@ -351,75 +349,75 @@ var error = {
 function NeuQuant() {
   // XXX changed by kaleido
   //var netsize = 256; // number of colours used
-  var netsize = 255; // number of colours used
+  const netsize = 255; // number of colours used
 
   // four primes near 500 - assume no image has a length so large
   // that it is divisible by all four primes
-  var prime1 = 499;
-  var prime2 = 491;
-  var prime3 = 487;
-  var prime4 = 503;
+  const prime1 = 499;
+  const prime2 = 491;
+  const prime3 = 487;
+  const prime4 = 503;
 
   // minimum size for input image
-  var minpicturebytes = 3 * prime4;
+  const minpicturebytes = 3 * prime4;
 
   // Network Definitions
 
-  var maxnetpos = netsize - 1;
-  var netbiasshift = 4; // bias for colour values
-  var ncycles = 100; // no. of learning cycles
+  const maxnetpos = netsize - 1;
+  const netbiasshift = 4; // bias for colour values
+  const ncycles = 100; // no. of learning cycles
 
   // defs for freq and bias
-  var intbiasshift = 16; // bias for fractions
-  var intbias = 1 << intbiasshift;
-  var gammashift = 10; // gamma = 1024
-  var gamma = 1 << gammashift;
-  var betashift = 10;
-  var beta = intbias >> betashift; // beta = 1/1024
-  var betagamma = intbias << (gammashift - betashift);
+  const intbiasshift = 16; // bias for fractions
+  const intbias = 1 << intbiasshift;
+  const gammashift = 10; // gamma = 1024
+  const gamma = 1 << gammashift;
+  const betashift = 10;
+  const beta = intbias >> betashift; // beta = 1/1024
+  const betagamma = intbias << (gammashift - betashift);
 
   // defs for decreasing radius factor
   // For 256 colors, radius starts at 32.0 biased by 6 bits
   // and decreases by a factor of 1/30 each cycle
-  var initrad = netsize >> 3;
-  var radiusbiasshift = 6;
-  var radiusbias = 1 << radiusbiasshift;
-  var initradius = initrad * radiusbias;
-  var radiusdec = 30;
+  const initrad = netsize >> 3;
+  const radiusbiasshift = 6;
+  const radiusbias = 1 << radiusbiasshift;
+  const initradius = initrad * radiusbias;
+  const radiusdec = 30;
 
   // defs for decreasing alpha factor
   // Alpha starts at 1.0 biased by 10 bits
-  var alphabiasshift = 10;
-  var initalpha = 1 << alphabiasshift;
-  var alphadec;
+  const alphabiasshift = 10;
+  const initalpha = 1 << alphabiasshift;
+  let alphadec;
 
   // radbias and alpharadbias used for radpower calculation
-  var radbiasshift = 8;
-  var radbias = 1 << radbiasshift;
-  var alpharadbshift = alphabiasshift + radbiasshift;
-  var alpharadbias = 1 << alpharadbshift;
+  const radbiasshift = 8;
+  const radbias = 1 << radbiasshift;
+  const alpharadbshift = alphabiasshift + radbiasshift;
+  const alpharadbias = 1 << alpharadbshift;
 
   // Input image
-  var thepicture;
+  let thepicture;
   // Height * Width * 3
-  var lengthcount;
+  let lengthcount;
   // Sampling factor 1..30
-  var samplefac;
+  let samplefac;
 
   // The network itself
-  var network;
-  var netindex = [];
+  let network;
+  const netindex = [];
 
   // for network lookup - really 256
-  var bias = [];
+  const bias = [];
 
   // bias and freq arrays for learning
-  var freq = [];
-  var radpower = [];
+  const freq = [];
+  const radpower = [];
 
   function NeuQuantConstructor(thepic, len, sample) {
-    var i;
-    var p;
+    let i;
+    let p;
 
     thepicture = thepic;
     lengthcount = len;
@@ -437,14 +435,14 @@ function NeuQuant() {
   }
 
   function colorMap() {
-    var map = [];
-    var index = new Array(netsize);
-    for (var i = 0; i < netsize; i++) {
+    const map = [];
+    const index = new Array(netsize);
+    for (let i = 0; i < netsize; i++) {
       index[network[i][3]] = i;
     }
-    var k = 0;
-    for (var l = 0; l < netsize; l++) {
-      var j = index[l];
+    let k = 0;
+    for (let l = 0; l < netsize; l++) {
+      const j = index[l];
       map[k++] = network[j][0];
       map[k++] = network[j][1];
       map[k++] = network[j][2];
@@ -455,14 +453,14 @@ function NeuQuant() {
   // Insertion sort of network and building of netindex[0..255]
   // (to do after unbias)
   function inxbuild() {
-    var i;
-    var j;
-    var smallpos;
-    var smallval;
-    var p;
-    var q;
-    var previouscol;
-    var startpos;
+    let i;
+    let j;
+    let smallpos;
+    let smallval;
+    let p;
+    let q;
+    let previouscol;
+    let startpos;
 
     previouscol = 0;
     startpos = 0;
@@ -522,20 +520,20 @@ function NeuQuant() {
   // Main Learning Loop
 
   function learn() {
-    var i;
-    var j;
-    var b;
-    var g;
-    var r;
-    var radius;
-    var rad;
-    var alpha;
-    var step;
-    var delta;
-    var samplepixels;
-    var p;
-    var pix;
-    var lim;
+    let i;
+    let j;
+    let b;
+    let g;
+    let r;
+    let radius;
+    let rad;
+    let alpha;
+    let step;
+    let delta;
+    let samplepixels;
+    let p;
+    let pix;
+    let lim;
 
     if (lengthcount < minpicturebytes) {
       samplefac = 1;
@@ -620,13 +618,13 @@ function NeuQuant() {
 
   // Search for BGR values 0..255 (after net is unbiased) and return colour index
   function map(b, g, r) {
-    var i;
-    var j;
-    var dist;
-    var a;
-    var bestd;
-    var p;
-    var best;
+    let i;
+    let j;
+    let dist;
+    let a;
+    let bestd;
+    let p;
+    let best;
 
     // Biggest possible distance is 256 * 3
     bestd = 1000;
@@ -720,8 +718,8 @@ function NeuQuant() {
   // Unbias network to give byte values 0..255 and record position i
   // to prepare for sort
   function unbiasnet() {
-    var i;
-    var j;
+    let i;
+    let j;
 
     for (i = 0; i < netsize; i++) {
       network[i][0] >>= netbiasshift;
@@ -734,14 +732,14 @@ function NeuQuant() {
   // Move adjacent neurons by precomputed alpha*(1-((i-j)^2/[r]^2))
   // in radpower[|i-j|]
   function alterneigh(rad, i, b, g, r) {
-    var j;
-    var k;
-    var lo;
-    var hi;
-    var a;
-    var m;
+    let j;
+    let k;
+    let lo;
+    let hi;
+    let a;
+    let m;
 
-    var p;
+    let p;
 
     lo = i - rad;
     if (lo < -1) {
@@ -786,8 +784,8 @@ function NeuQuant() {
   // Move neuron i towards biased (b,g,r) by factor alpha
   function altersingle(alpha, i, b, g, r) {
     // alter hit neuron
-    var n = network[i];
-    var alphaMult = alpha / initalpha;
+    const n = network[i];
+    const alphaMult = alpha / initalpha;
     n[0] -= (alphaMult * (n[0] - b)) | 0;
     n[1] -= (alphaMult * (n[1] - g)) | 0;
     n[2] -= (alphaMult * (n[2] - r)) | 0;
@@ -800,16 +798,16 @@ function NeuQuant() {
     // for frequently chosen neurons, freq[i] is high and bias[i] is negative
     // bias[i] = gamma*((1/netsize)-freq[i])
 
-    var i;
-    var dist;
-    var a;
-    var biasdist;
-    var betafreq;
-    var bestpos;
-    var bestbiaspos;
-    var bestd;
-    var bestbiasd;
-    var n;
+    let i;
+    let dist;
+    let a;
+    let biasdist;
+    let betafreq;
+    let bestpos;
+    let bestbiaspos;
+    let bestd;
+    let bestbiasd;
+    let n;
 
     bestd = ~(1 << 31);
     bestbiasd = bestd;
@@ -864,7 +862,7 @@ function NeuQuant() {
 
   NeuQuantConstructor.apply(this, arguments);
 
-  var exports = {};
+  const exports = {};
   exports.map = map;
   exports.process = process;
 
@@ -872,12 +870,12 @@ function NeuQuant() {
 }
 
 function workerCode() {
-  var self = this;
+  const self = this;
 
   try {
-    self.onmessage = function (ev) {
-      var data = ev.data || {};
-      var response;
+    self.onmessage = ev => {
+      const data = ev.data || {};
+      let response;
 
       if (data.gifshot) {
         response = workerMethods.run(data);
@@ -886,11 +884,11 @@ function workerCode() {
     };
   } catch (e) {}
 
-  var workerMethods = {
-    dataToRGB: function dataToRGB(data, width, height) {
-      var length = width * height * 4;
-      var i = 0;
-      var rgb = [];
+  const workerMethods = {
+    dataToRGB: (data, width, height) => {
+      const length = width * height * 4;
+      let i = 0;
+      const rgb = [];
 
       while (i < length) {
         // XXX CHANGED BY KALEIDO
@@ -898,7 +896,7 @@ function workerCode() {
         //rgb.push(data[i++]);
         //rgb.push(data[i++]);
         //i++; // for the alpha channel which we don't care about
-        var r = data[i++],
+        let r = data[i++],
           g = data[i++],
           b = data[i++],
           a = data[i++];
@@ -923,22 +921,22 @@ function workerCode() {
       return rgb;
     },
     // XXX added by kaleido
-    dataToTransparent: function dataToTransparent(data) {
-      var transparent = [];
-      for (var i = 3; i < data.length; i += 4) {
+    dataToTransparent: data => {
+      const transparent = [];
+      for (let i = 3; i < data.length; i += 4) {
         transparent.push(data[i] < 128);
       }
       return transparent;
     },
-    componentizedPaletteToArray: function componentizedPaletteToArray(paletteRGB) {
+    componentizedPaletteToArray: paletteRGB => {
       paletteRGB = paletteRGB || [];
 
-      var paletteArray = [];
+      const paletteArray = [];
 
-      for (var i = 0; i < paletteRGB.length; i += 3) {
-        var r = paletteRGB[i];
-        var g = paletteRGB[i + 1];
-        var b = paletteRGB[i + 2];
+      for (let i = 0; i < paletteRGB.length; i += 3) {
+        const r = paletteRGB[i];
+        const g = paletteRGB[i + 1];
+        const b = paletteRGB[i + 2];
 
         paletteArray.push((r << 16) | (g << 8) | b);
       }
@@ -946,14 +944,14 @@ function workerCode() {
       return paletteArray;
     },
     // This is the "traditional" Animated_GIF style of going from RGBA to indexed color frames
-    processFrameWithQuantizer: function processFrameWithQuantizer(imageData, width, height, sampleInterval) {
-      var rgbComponents = this.dataToRGB(imageData, width, height);
+    processFrameWithQuantizer: function (imageData, width, height, sampleInterval) {
+      const rgbComponents = this.dataToRGB(imageData, width, height);
 
       // XXX changed by kaleido
-      var transparent = this.dataToTransparent(imageData);
-      var nq = new NeuQuant(rgbComponents, rgbComponents.length, sampleInterval);
-      var paletteRGB = nq.process();
-      var componentizedPaletteArray = this.componentizedPaletteToArray(paletteRGB);
+      const transparent = this.dataToTransparent(imageData);
+      const nq = new NeuQuant(rgbComponents, rgbComponents.length, sampleInterval);
+      const paletteRGB = nq.process();
+      const componentizedPaletteArray = this.componentizedPaletteToArray(paletteRGB);
       componentizedPaletteArray.unshift(0);
 
       var paletteArray = new Uint32Array(componentizedPaletteArray);
@@ -983,13 +981,12 @@ function workerCode() {
     run: function run(frame) {
       frame = frame || {};
 
-      var _frame = frame,
+      const _frame = frame,
         height = _frame.height,
-        palette = _frame.palette,
         sampleInterval = _frame.sampleInterval,
         width = _frame.width;
 
-      var imageData = frame.data;
+      const imageData = frame.data;
 
       return this.processFrameWithQuantizer(imageData, width, height, sampleInterval);
     },
@@ -1333,7 +1330,7 @@ function gifWriter(buf, width, height, gopts) {
   }
 }
 
-var noop$2 = function noop() {};
+function noop() {}
 
 var AnimatedGIF = function AnimatedGIF(options) {
   this.canvas = null;
@@ -1341,8 +1338,8 @@ var AnimatedGIF = function AnimatedGIF(options) {
   this.repeat = 0;
   this.frames = [];
   this.numRenderedFrames = 0;
-  this.onRenderCompleteCallback = noop$2;
-  this.onRenderProgressCallback = noop$2;
+  this.onRenderCompleteCallback = noop;
+  this.onRenderProgressCallback = noop;
   this.workers = [];
   this.availableWorkers = [];
   this.generatingGIF = false;
@@ -1539,18 +1536,13 @@ AnimatedGIF.prototype = {
       loop: this.repeat,
     };
     var options = this.options;
-    var interval = options.interval;
 
     var frameDuration = options.frameDuration;
-    var existingImages = options.images;
-    var hasExistingImages = !!existingImages.length;
     var height = options.gifHeight;
     var width = options.gifWidth;
     var gifWriter$$1 = new gifWriter(buffer, width, height, gifOptions);
     var onRenderProgressCallback = this.onRenderProgressCallback;
-    var delay = hasExistingImages ? interval * 100 : 0;
-    var bufferToString = void 0;
-    var gif = void 0;
+
 
     this.generatingGIF = true;
 

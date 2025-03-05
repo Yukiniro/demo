@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRef } from "react";
 import { GIFEncoder, quantize, applyPalette } from "gifenc";
-// import { AnimatedGIF, defaultOptions } from "gifshot";
 import AnimatedGIF from "./lib/AnimatedGIF";
 
 function App() {
