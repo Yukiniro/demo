@@ -1,11 +1,10 @@
 import "./App.css";
-import videoUrl from './assets/bunny.mp4';
-import MP4Box from 'mp4box'
+import videoUrl from "./assets/bunny.mp4";
+import MP4Box from "mp4box";
 import { parseVideoCodecDesc, sleep } from "./util";
 import { useRef } from "react";
 
 const App = () => {
-
   const canvasRef = useRef(null);
 
   const decodeVideo = async () => {
@@ -17,10 +16,10 @@ const App = () => {
 
     const decodeVideo = async videoSamples => {
       const videoDecoder = new VideoDecoder({
-        error: (e) => {
+        error: e => {
           console.error(e);
         },
-        output: (vf) => {
+        output: vf => {
           videoFrames.push(vf);
           canvasRef.current.width = vf.displayWidth;
           canvasRef.current.height = vf.displayHeight;
@@ -29,8 +28,7 @@ const App = () => {
         },
       });
 
-      const { track_width, track_height, codec, timescale, id } =
-        videoInfo.videoTracks[0];
+      const { track_width, track_height, codec, timescale, id } = videoInfo.videoTracks[0];
       const desc = parseVideoCodecDesc(mp4box.getTrackById(id)).buffer;
 
       const videoConfig = {
@@ -62,7 +60,7 @@ const App = () => {
       }
     };
 
-    mp4box.onError = (e) => {
+    mp4box.onError = e => {
       console.error(e);
     };
     mp4box.onReady = info => {
