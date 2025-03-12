@@ -5,16 +5,16 @@
 @import "~@douyinfe/semi-ui/dist/css/semi.min.css";
 
 .semi-button-primary:not(.semi-button-light):not(.semi-button-borderless) {
-    background-color: var(--semi-color-primary);
+  background-color: var(--semi-color-primary);
 }
 
 .semi-button-light:not(.semi-button-borderless) {
-    background-color: var(--semi-color-fill-0);
+  background-color: var(--semi-color-fill-0);
 }
 
 html,
 body,
 #root {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
