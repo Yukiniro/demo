@@ -1543,7 +1543,6 @@ AnimatedGIF.prototype = {
     var gifWriter$$1 = new gifWriter(buffer, width, height, gifOptions);
     var onRenderProgressCallback = this.onRenderProgressCallback;
 
-
     this.generatingGIF = true;
 
     utils.each(frames, function (iterator, frame) {
