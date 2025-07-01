@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { isUndefined } from "lodash-es";
 import React, { useState, useRef } from "react";
 
 export default function Home() {
@@ -15,7 +16,12 @@ export default function Home() {
     eventSourceRef.current = eventSource;
     
     eventSource.onmessage = (event) => {
-      setMessage(event.data);
+      const data = JSON.parse(event.data);
+      if (isUndefined(data.count)) {
+        setMessage(data);
+      } else {
+        setMessage(data.count);
+      }
     };
     
     eventSource.onerror = (event) => {

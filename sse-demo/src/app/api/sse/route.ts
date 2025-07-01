@@ -10,7 +10,12 @@ export async function GET() {
       let count = 0;
       interval = setInterval(() => {
         count++;
-        const data = `data: ${count}\n\n`;
+        let data = '';
+        if (count > 5) {
+          data = `data: { "count": ${count} } \n\n`;
+        } else {
+          data = `data: ${count}\n\n`;
+        }
         controller.enqueue(encoder.encode(data));
       }, 1000);
 
